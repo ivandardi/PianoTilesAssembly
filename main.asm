@@ -26,6 +26,10 @@
 
     # Largura da tela
     .eqv SCREEN_HEIGHT 64
+    
+    .eqv COR_BLACK 0x00000000
+    
+    .eqv COR_WHITE 0x00FFFFFF
 
 
 
@@ -55,11 +59,27 @@
         li $a0, %pitch
         li $a1, 1200
         li $a2, 0
-        li $a3, 0xFFFF
+        li $a3, 0x7F
         syscall
     .end_macro
 
+    .macro CLEAR_SCREEN (%cor)
+        li $a0, %cor
+        jal ClearScreen
+    .end_macro
 
+    .macro DRAW_RECT (%x, %y, %cor)
+        li $a0, %x
+        li $a1, %y
+        li $a2, %cor
+        jal DrawRect
+    .end_macro
+    
+    .macro SLEEP(%ms)
+        li $v0, 32
+        li $a0, %ms
+        syscall
+    .end_macro
 
 #
 # PROGRAM
@@ -71,22 +91,36 @@
 
 
 main:
-    li $a0, 0x00FFFFFF
-    jal ClearScreen
-
-    li $a0, 1
-    li $a1, 3
-    li $a2, 0x000000FF
-    jal DrawRect
-
-    PLAY_NOTE(60)
-    PLAY_NOTE(62)
-    PLAY_NOTE(63)
-    PLAY_NOTE(65)
-    PLAY_NOTE(67)
-    PLAY_NOTE(69)
-    PLAY_NOTE(70)
+    
+    CLEAR_SCREEN(COR_WHITE)
+    DRAW_RECT(0, 0, COR_BLACK)
+    DRAW_RECT(8, 16, COR_BLACK)
+    DRAW_RECT(16, 32, COR_BLACK)
+    DRAW_RECT(24, 48, COR_BLACK)
     PLAY_NOTE(72)
+    SLEEP(1000)
+    
+    CLEAR_SCREEN(COR_WHITE)
+    DRAW_RECT(0, 16, COR_BLACK)
+    DRAW_RECT(8, 32, COR_BLACK)
+    DRAW_RECT(16, 48, COR_BLACK)
+    PLAY_NOTE(70)
+    SLEEP(1000)
+    
+    CLEAR_SCREEN(COR_WHITE)
+    DRAW_RECT(0, 32, COR_BLACK)
+    DRAW_RECT(8, 48, COR_BLACK)
+    PLAY_NOTE(69)
+    SLEEP(1000)
+
+    CLEAR_SCREEN(COR_WHITE)
+    DRAW_RECT(0, 48, COR_BLACK)
+    PLAY_NOTE(67)
+    SLEEP(1000)
+    
+    CLEAR_SCREEN(COR_WHITE)
+    PLAY_NOTE(65)
+    SLEEP(1000)
 
     done
 
