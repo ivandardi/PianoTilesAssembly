@@ -27,6 +27,9 @@
     # Largura da tela
     .eqv SCREEN_HEIGHT 64
     
+    # Endereco de memoria com a entrada do usuario
+    .eqv USER_INPUT 0xffff0004
+    
     #
     # CORES
     #
@@ -107,36 +110,8 @@
 
 main:
     
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 0, COR_BLACK)
-    DRAW_RECT(8, 16, COR_BLACK)
-    DRAW_RECT(16, 32, COR_BLACK)
-    DRAW_RECT(24, 48, COR_BLACK)
-    PLAY_NOTE(72)
-    SLEEP(1000)
+    jal Gameloop
     
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 16, COR_BLACK)
-    DRAW_RECT(8, 32, COR_BLACK)
-    DRAW_RECT(16, 48, COR_BLACK)
-    PLAY_NOTE(70)
-    SLEEP(1000)
-    
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 32, COR_BLACK)
-    DRAW_RECT(8, 48, COR_BLACK)
-    PLAY_NOTE(69)
-    SLEEP(1000)
-
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 48, COR_BLACK)
-    PLAY_NOTE(67)
-    SLEEP(1000)
-    
-    CLEAR_SCREEN(COR_WHITE)
-    PLAY_NOTE(65)
-    SLEEP(1000)
-
     DONE
 
 
@@ -146,6 +121,42 @@ main:
 #
 FUNCTION_BEGIN Gameloop
 
+    # INPUT
+
+    li $t0, USER_INPUT
+Gameloop.input:
+    SLEEP(250)
+    # read user input
+    lw $t1, 0($t0)
+    beqz $t1, Gameloop.input
+    
+    # reset user input to zero
+    sw $zero, 0($t0)
+    
+    # subtract '0' to obtain true number
+    subi $t1, $t1, 48
+    
+    # Test if user entered 1, 2, 3, or 4
+    beq $t1, 1, Gameloop.ifEquals1
+    beq $t1, 2, Gameloop.ifEquals2
+    beq $t1, 3, Gameloop.ifEquals3
+    beq $t1, 4, Gameloop.ifEquals4
+    # Invalid input, try again
+    j Gameloop.input
+    
+Gameloop.ifEquals1:
+    PLAY_NOTE(60)
+    j Gameloop.input
+Gameloop.ifEquals2:
+    PLAY_NOTE(62)
+    j Gameloop.input
+Gameloop.ifEquals3:
+    PLAY_NOTE(64)
+    j Gameloop.input
+Gameloop.ifEquals4:
+    PLAY_NOTE(65)
+    j Gameloop.input
+    
 FUNCTION_END
 
 
@@ -154,7 +165,7 @@ FUNCTION_END
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
     li    $t0, SCREEN_BEGIN # iterator
-    li    $t1, SCREEN_END   #end value of the for loop
+    li    $t1, SCREEN_END   # end value of the for loop
 .forloop:
     sub   $t2, $t0, $t1     # $t1 is bit flag
     beqz  $t2, .endforloop
