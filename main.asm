@@ -90,6 +90,14 @@
         jal DrawRect
     .end_macro
     
+    # Macro para facilitar chamar a funcao de desenhar pixel
+    .macro DRAW_PIXEL (%x, %y, %cor)
+        li $a0, %x
+        li $a1, %y
+        li $a2, %cor
+        jal DrawPixel
+    .end_macro
+        
     # Macro que faz o programa esperar por %ms milissegundos
     .macro SLEEP(%ms)
         li $v0, 32
@@ -137,6 +145,8 @@ main:
     PLAY_NOTE(65)
     SLEEP(1000)
 
+    DRAW_PIXEL(0, 0, COR_BLACK)
+      
     DONE
 
 
@@ -198,3 +208,11 @@ DrawRect.endforloop2:
 DrawRect.endforloop1:
 FUNCTION_END
 
+FUNCTION_BEGIN DrawPixel
+    move $t8, $a1                # $t8 = y
+    rol  $t8, $t8, 5             # $t8 = y  * SCREEN_WIDTH
+    add  $t8, $t8, $a0           # $t8 = y  * SCREEN_WIDTH + x
+    rol  $t8, $t8, 2             # $t8 = (y * SCREEN_WIDTH + x) * 4
+    addi $t8, $t8, SCREEN_BEGIN  # $t8 = (y * SCREEN_WIDTH + x) * 4 + SCREEN_BEGIN
+    sw   $a2, ($t8)              # tela[y*w + x] = $a2
+FUNCTION_END
