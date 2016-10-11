@@ -27,18 +27,31 @@
     # Largura da tela
     .eqv SCREEN_HEIGHT 64
     
+    #
+    # CORES
+    #
+    
+    # Preto
     .eqv COR_BLACK 0x00000000
     
+    # Branco
     .eqv COR_WHITE 0x00FFFFFF
 
+    # Vermelho
+    .eqv COR_RED 0x00FF0000
 
+    # Verde
+    .eqv COR_GREEN 0x0000FF00
+
+    # Azul
+    .eqv COR_BLUE 0x000000FF
 
 #
 # MACROS
 #
 
     # Macro que para a execução do programa
-    .macro done
+    .macro DONE
         li $v0,10
         syscall
     .end_macro
@@ -63,11 +76,13 @@
         syscall
     .end_macro
 
+    # Macro pra facilitar chamar a funcao de limpar a tela
     .macro CLEAR_SCREEN (%cor)
         li $a0, %cor
         jal ClearScreen
     .end_macro
 
+    # Macro pra facilitar chamar a funcao de desenhar retangulo
     .macro DRAW_RECT (%x, %y, %cor)
         li $a0, %x
         li $a1, %y
@@ -75,6 +90,7 @@
         jal DrawRect
     .end_macro
     
+    # Macro que faz o programa esperar por %ms milissegundos
     .macro SLEEP(%ms)
         li $v0, 32
         li $a0, %ms
@@ -88,7 +104,6 @@
 .data
 
 .text
-
 
 main:
     
@@ -122,7 +137,7 @@ main:
     PLAY_NOTE(65)
     SLEEP(1000)
 
-    done
+    DONE
 
 
 
