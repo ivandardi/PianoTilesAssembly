@@ -35,19 +35,10 @@
     #
     
     # Preto
-    .eqv COR_BLACK 0x00000000
+    .eqv COR_SCREEN 0x00000000
     
     # Branco
-    .eqv COR_WHITE 0x00FFFFFF
-
-    # Vermelho
-    .eqv COR_RED 0x00FF0000
-
-    # Verde
-    .eqv COR_GREEN 0x0000FF00
-
-    # Azul
-    .eqv COR_BLUE 0x000000FF
+    .eqv COR_TILE 0x00FFFFFF
 
 #
 # MACROS
@@ -148,7 +139,7 @@
 .text
 
 main:
-    
+    CLEAR_SCREEN(COR_SCREEN)
     jal Gameloop
     
     DONE
@@ -168,6 +159,8 @@ FUNCTION_BEGIN Gameloop
     # INPUT
 
     li $s0, USER_INPUT
+    
+    j Gameloop.display
 Gameloop.input:
     # read user input
     lw $t1, 0($s0)
@@ -215,9 +208,56 @@ Gameloop.success:
     # If note is 0, then the song ended
     lw $t0, 0($s1)
     beqz $t0, Gameloop.failure
+    
+    #
+    # DISPLAY
+    #
+Gameloop.display:
+    CLEAR_SCREEN(COR_SCREEN)
+    
+    # The logic to display the tiles in the correct column is:
+    # (number of column - 1) * 8
+    li $a2, COR_TILE
+    
+    # Bottom row
+    lw   $a0, 0($s1)
+    beqz $a0, Gameloop.next
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 3
+    li   $a1, 48
+    jal DrawRect
+
+    # Middle-Bottom row
+    lw   $a0, 4($s1)
+    beqz $a0, Gameloop.next
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 3
+    li   $a1, 32
+    jal DrawRect
+
+    # Middle-Top row
+    lw   $a0, 8($s1)
+    beqz $a0, Gameloop.next
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 3
+    li   $a1, 16
+    jal DrawRect
+
+    # Top row
+    lw   $a0, 12($s1)
+    beqz $a0, Gameloop.next
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 3
+    move $a1, $zero
+    jal DrawRect
+
+Gameloop.next:
+
     j Gameloop.input
 
 Gameloop.failure:
+
+    CLEAR_SCREEN(0x00FF0000)
 
     STACK_LOAD($ra, $s0, $s1)
 
@@ -256,7 +296,7 @@ DrawRect.forloop1:
 
     move $t0, $a0                       # j = x
 DrawRect.forloop2:
-    beq  $t0, $s0, DrawRect.endforloop2 # j < x + 8
+    beq $t0, $s0, DrawRect.endforloop2 # j < x + 8
 
     move $t1, $a1                       # $t1 = y
     rol  $t1, $t1, 5                    # $t1 = y  * SCREEN_WIDTH
