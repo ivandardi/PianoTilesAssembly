@@ -1,6 +1,6 @@
 # PIANO TILES IN MIPS ASSEMBLY
 #
-# A tela é de 32 x 64
+# A tela ï¿½ de 32 x 64
 #
 
 
@@ -53,25 +53,25 @@
 # MACROS
 #
 
-    # Macro que para a execução do programa
+    # Macro que para a execuï¿½ï¿½o do programa
     .macro DONE
         li $v0,10
         syscall
     .end_macro
 
-    # Macro de início de função
+    # Macro de inï¿½cio de funï¿½ï¿½o
     .macro FUNCTION_BEGIN (%name)
         %name :
     .end_macro
 
-    # Macro de fim de função
+    # Macro de fim de funï¿½ï¿½o
     .macro FUNCTION_END
         jr $ra
     .end_macro
 
     # Macro que toca nota de piano. pitch = 60 significa C
     .macro PLAY_NOTE (%pitch)
-        li $v0, 33
+        li $v0, 31
         li $a0, %pitch
         li $a1, 1200
         li $a2, 0
@@ -125,7 +125,6 @@ FUNCTION_BEGIN Gameloop
 
     li $t0, USER_INPUT
 Gameloop.input:
-    SLEEP(250)
     # read user input
     lw $t1, 0($t0)
     beqz $t1, Gameloop.input
@@ -141,6 +140,12 @@ Gameloop.input:
     beq $t1, 2, Gameloop.ifEquals2
     beq $t1, 3, Gameloop.ifEquals3
     beq $t1, 4, Gameloop.ifEquals4
+    beq $t1, 5, Gameloop.ifEquals5
+    beq $t1, 6, Gameloop.ifEquals6
+    beq $t1, 7, Gameloop.ifEquals7
+    beq $t1, 8, Gameloop.ifEquals8
+    beq $t1, 9, Gameloop.ifEquals9
+    beq $t1, 0, Gameloop.ifEquals10
     # Invalid input, try again
     j Gameloop.input
     
@@ -156,12 +161,33 @@ Gameloop.ifEquals3:
 Gameloop.ifEquals4:
     PLAY_NOTE(65)
     j Gameloop.input
-    
+Gameloop.ifEquals5:
+    PLAY_NOTE(67)
+    j Gameloop.input
+Gameloop.ifEquals6:
+    PLAY_NOTE(69)
+    j Gameloop.input
+Gameloop.ifEquals7:
+    PLAY_NOTE(71)
+    j Gameloop.input
+Gameloop.ifEquals8:
+    PLAY_NOTE(72)
+    j Gameloop.input
+Gameloop.ifEquals9:
+    PLAY_NOTE(74)
+    j Gameloop.input
+Gameloop.ifEquals10:
+    PLAY_NOTE(76)
+    j Gameloop.input
+
+
+
+
 FUNCTION_END
 
 
 
-# Função de limpar a tela
+# Funï¿½ï¿½o de limpar a tela
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
     li    $t0, SCREEN_BEGIN # iterator
