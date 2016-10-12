@@ -99,12 +99,51 @@
         li $a0, %ms
         syscall
     .end_macro
+    
+    # Macros que facilitam salvar na pilha. Os registradores sao salvos em ordem
+    .macro STACK_SAVE(%a)
+        subi $sp, $sp, 4
+        sw %a, 0($sp)
+    .end_macro
+    
+    .macro STACK_SAVE(%a, %b)
+        subi $sp, $sp, 8
+        sw %a, 0($sp)
+        sw %b, 4($sp)
+    .end_macro
+
+    .macro STACK_SAVE(%a, %b, %c)
+        subi $sp, $sp, 12
+        sw %r1, 0($sp)
+        sw %b, 4($sp)
+        sw %c, 8($sp)
+    .end_macro
+
+    .macro STACK_LOAD(%a)
+        lw %a, 0($sp)
+        addi $sp, $sp, 4
+    .end_macro
+    
+    .macro STACK_LOAD(%a, %b)
+        lw %a, 0($sp)
+        lw %b, 4($sp)
+        addi $sp, $sp, 8
+    .end_macro
+
+    .macro STACK_LOAD(%a, %b, %c)
+        lw %a, 0($sp)
+        lw %b, 4($sp)
+        lw %c, 8($sp)
+        addi $sp, $sp, 12
+    .end_macro
 
 #
 # PROGRAM
 #
 
 .data
+
+    notesdebug: .word 1, 2, 3, 4, 3, 2, 1, 4, 3, 2, 1, 2, 3, 4, 0
 
 .text
 
@@ -121,67 +160,66 @@ main:
 #
 FUNCTION_BEGIN Gameloop
 
+    STACK_SAVE($s0, $s1)
+    
+    # Load first note into $s1
+    la $s1, notesdebug
+    
     # INPUT
 
-    li $t0, USER_INPUT
+    li $s0, USER_INPUT
 Gameloop.input:
     # read user input
-    lw $t1, 0($t0)
+    lw $t1, 0($s0)
     beqz $t1, Gameloop.input
     
     # reset user input to zero
-    sw $zero, 0($t0)
+    sw $zero, 0($s0)
     
     # subtract '0' to obtain true number
     subi $t1, $t1, 48
     
     # Test if user entered 1, 2, 3, or 4
+    lw $t0, 0($s1)
+    beq $t1, $t0, Gameloop.correctInput
+    
+    # Invalid input, user lost
+    j Gameloop.failure
+      
+Gameloop.correctInput:
+
+    # Check to see which note should be played
     beq $t1, 1, Gameloop.ifEquals1
     beq $t1, 2, Gameloop.ifEquals2
     beq $t1, 3, Gameloop.ifEquals3
     beq $t1, 4, Gameloop.ifEquals4
-    beq $t1, 5, Gameloop.ifEquals5
-    beq $t1, 6, Gameloop.ifEquals6
-    beq $t1, 7, Gameloop.ifEquals7
-    beq $t1, 8, Gameloop.ifEquals8
-    beq $t1, 9, Gameloop.ifEquals9
-    beq $t1, 0, Gameloop.ifEquals10
-    # Invalid input, try again
-    j Gameloop.input
     
 Gameloop.ifEquals1:
     PLAY_NOTE(60)
-    j Gameloop.input
+    j Gameloop.success
 Gameloop.ifEquals2:
     PLAY_NOTE(62)
-    j Gameloop.input
+    j Gameloop.success
 Gameloop.ifEquals3:
     PLAY_NOTE(64)
-    j Gameloop.input
+    j Gameloop.success
 Gameloop.ifEquals4:
     PLAY_NOTE(65)
-    j Gameloop.input
-Gameloop.ifEquals5:
-    PLAY_NOTE(67)
-    j Gameloop.input
-Gameloop.ifEquals6:
-    PLAY_NOTE(69)
-    j Gameloop.input
-Gameloop.ifEquals7:
-    PLAY_NOTE(71)
-    j Gameloop.input
-Gameloop.ifEquals8:
-    PLAY_NOTE(72)
-    j Gameloop.input
-Gameloop.ifEquals9:
-    PLAY_NOTE(74)
-    j Gameloop.input
-Gameloop.ifEquals10:
-    PLAY_NOTE(76)
+    j Gameloop.success
+
+Gameloop.success:
+
+    # Go to next note
+    addi $s1, $s1, 4
+    
+    # If note is 0, then the song ended
+    lw $t0, 0($s1)
+    beqz $t0, Gameloop.failure
     j Gameloop.input
 
+Gameloop.failure:
 
-
+    STACK_LOAD($s0, $s1)
 
 FUNCTION_END
 
