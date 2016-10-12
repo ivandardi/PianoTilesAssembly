@@ -114,7 +114,7 @@
 
     .macro STACK_SAVE(%a, %b, %c)
         subi $sp, $sp, 12
-        sw %r1, 0($sp)
+        sw %a, 0($sp)
         sw %b, 4($sp)
         sw %c, 8($sp)
     .end_macro
@@ -160,7 +160,7 @@ main:
 #
 FUNCTION_BEGIN Gameloop
 
-    STACK_SAVE($s0, $s1)
+    STACK_SAVE($ra, $s0, $s1)
     
     # Load first note into $s1
     la $s1, notesdebug
@@ -219,7 +219,7 @@ Gameloop.success:
 
 Gameloop.failure:
 
-    STACK_LOAD($s0, $s1)
+    STACK_LOAD($ra, $s0, $s1)
 
 FUNCTION_END
 
@@ -228,15 +228,16 @@ FUNCTION_END
 # Fun��o de limpar a tela
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
-    li    $t0, SCREEN_BEGIN # iterator
-    li    $t1, SCREEN_END   # end value of the for loop
+    STACK_SAVE($s0, $s1)
+    li    $s0, SCREEN_BEGIN # iterator
+    li    $s1, SCREEN_END   # end value of the for loop
 .forloop:
-    sub   $t2, $t0, $t1     # $t1 is bit flag
-    beqz  $t2, .endforloop
-    sw    $a0, 0($t0)       # Set $t0 to the color stored in $a0
-    addiu $t0, $t0, 4       # Increment %t0 by 4
+    beq   $s0, $s1, .endforloop
+    sw    $a0, 0($s0)       # Set $s0 to the color stored in $a0
+    addiu $s0, $s0, 4       # Increment %s0 by 4
     j     .forloop
 .endforloop:
+    STACK_LOAD($s0, $s1)
 FUNCTION_END
 
 
@@ -246,30 +247,31 @@ FUNCTION_END
 # $a1: y
 # $a2: cor
 FUNCTION_BEGIN DrawRect
-    add $t0, $a0, RECT_WIDTH
-    add $t1, $a1, RECT_HEIGHT
+    STACK_SAVE($s0, $s1)
+    add  $s0, $a0, RECT_WIDTH  # Stop condition variable
+    add  $s1, $a1, RECT_HEIGHT # Stop condition variable
 DrawRect.forloop1:
-    sub  $v0, $t1, $a1
-    beqz $v0, DrawRect.endforloop1
 
-    move $t9, $a0
+    beq  $a1, $s1, DrawRect.endforloop1 # i < y + 16
+
+    move $t0, $a0                       # j = x
 DrawRect.forloop2:
-    sub  $v0, $t0, $t9
-    beqz $v0, DrawRect.endforloop2
+    beq  $t0, $s0, DrawRect.endforloop2 # j < x + 8
 
-    move $t8, $a1                # $t8 = y
-    rol  $t8, $t8, 5             # $t8 = y  * SCREEN_WIDTH
-    add  $t8, $t8, $t9           # $t8 = y  * SCREEN_WIDTH + x
-    rol  $t8, $t8, 2             # $t8 = (y * SCREEN_WIDTH + x) * 4
-    addi $t8, $t8, SCREEN_BEGIN  # $t8 = (y * SCREEN_WIDTH + x) * 4 + SCREEN_BEGIN
-    sw   $a2, ($t8)              # tela[y*w + x] = $a2
+    move $t1, $a1                       # $t1 = y
+    rol  $t1, $t1, 5                    # $t1 = y  * SCREEN_WIDTH
+    add  $t1, $t1, $t0                  # $t1 = y  * SCREEN_WIDTH + x
+    rol  $t1, $t1, 2                    # $t1 = (y * SCREEN_WIDTH + x) * 4
+    addi $t1, $t1, SCREEN_BEGIN         # $t1 = (y * SCREEN_WIDTH + x) * 4 + SCREEN_BEGIN
+    sw   $a2, ($t1)                     # tela[y*w + x] = $a2
 
-    addi $t9, $t9, 1
+    addi $t0, $t0, 1                    # j++
     j DrawRect.forloop2
 DrawRect.endforloop2:
 
-    addi $a1, $a1, 1
+    addi $a1, $a1, 1                    # i++
     j DrawRect.forloop1
 DrawRect.endforloop1:
+    STACK_LOAD($s0, $s1)
 FUNCTION_END
 
