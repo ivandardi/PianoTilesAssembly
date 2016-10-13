@@ -1,6 +1,6 @@
 # PIANO TILES IN MIPS ASSEMBLY
 #
-# A tela � de 32 x 64
+# A tela e de 32 x 64
 #
 
 
@@ -56,18 +56,18 @@
 # MACROS
 #
 
-    # Macro que para a execu��o do programa
+    # Macro que para a execucao do programa
     .macro DONE
         li $v0,10
         syscall
     .end_macro
 
-    # Macro de in�cio de fun��o
+    # Macro de inicio de funcao
     .macro FUNCTION_BEGIN (%name)
         %name :
     .end_macro
 
-    # Macro de fim de fun��o
+    # Macro de fim de funcao
     .macro FUNCTION_END
         jr $ra
     .end_macro
@@ -197,7 +197,7 @@ Gameloop.input:
     lw $t0, 0($s1)
     bne $t1, $t0, Gameloop.failure
 
-    #Play note
+    # Play note
     li $v0, 31
     lw $a0, 0($s2)
     li $a1, 1200
@@ -276,7 +276,7 @@ FUNCTION_END
 
 
 
-# Fun��o de limpar a tela
+# Funcao de limpar a tela
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
     STACK_SAVE($s0, $s1)
