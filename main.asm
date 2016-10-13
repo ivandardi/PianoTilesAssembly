@@ -26,19 +26,31 @@
 
     # Largura da tela
     .eqv SCREEN_HEIGHT 64
-    
+
     # Endereco de memoria com a entrada do usuario
     .eqv USER_INPUT 0xffff0004
-    
+
     #
     # CORES
     #
-    
-    # Preto
-    .eqv COR_SCREEN 0x00000000
-    
-    # Branco
-    .eqv COR_TILE 0x00FFFFFF
+
+    .eqv COR_BLACK 0x00000000
+
+    .eqv COR_WHITE 0x00FFFFFF
+
+    .eqv COR_RED   0x00FF0000
+
+    .eqv COR_GREEN 0x0000FF00
+
+    .eqv COR_BLUE  0x000000FF
+
+    .eqv COR_FAIL COR_RED
+
+    .eqv COR_SUCCESS COR_GREEN
+
+    .eqv COR_SCREEN COR_WHITE
+
+    .eqv COR_TILE COR_BLACK
 
 #
 # MACROS
@@ -60,16 +72,6 @@
         jr $ra
     .end_macro
 
-    # Macro que toca nota de piano. pitch = 60 significa C
-    .macro PLAY_NOTE (%pitch)
-        li $v0, 31
-        li $a0, %pitch
-        li $a1, 1200
-        li $a2, 0
-        li $a3, 0x7F
-        syscall
-    .end_macro
-
     # Macro pra facilitar chamar a funcao de limpar a tela
     .macro CLEAR_SCREEN (%cor)
         li $a0, %cor
@@ -83,38 +85,46 @@
         li $a2, %cor
         jal DrawRect
     .end_macro
-    
+
     # Macro que faz o programa esperar por %ms milissegundos
     .macro SLEEP(%ms)
         li $v0, 32
         li $a0, %ms
         syscall
     .end_macro
-    
+
     # Macros que facilitam salvar na pilha. Os registradores sao salvos em ordem
     .macro STACK_SAVE(%a)
-        subi $sp, $sp, 4
+        addi $sp, $sp, -4
         sw %a, 0($sp)
     .end_macro
-    
+
     .macro STACK_SAVE(%a, %b)
-        subi $sp, $sp, 8
+        addi $sp, $sp, -8
         sw %a, 0($sp)
         sw %b, 4($sp)
     .end_macro
 
     .macro STACK_SAVE(%a, %b, %c)
-        subi $sp, $sp, 12
+        addi $sp, $sp, -12
         sw %a, 0($sp)
         sw %b, 4($sp)
         sw %c, 8($sp)
+    .end_macro
+
+    .macro STACK_SAVE(%a, %b, %c, %d)
+        addi $sp, $sp, -16
+        sw %a, 0($sp)
+        sw %b, 4($sp)
+        sw %c, 8($sp)
+        sw %d, 12($sp)
     .end_macro
 
     .macro STACK_LOAD(%a)
         lw %a, 0($sp)
         addi $sp, $sp, 4
     .end_macro
-    
+
     .macro STACK_LOAD(%a, %b)
         lw %a, 0($sp)
         lw %b, 4($sp)
@@ -128,20 +138,29 @@
         addi $sp, $sp, 12
     .end_macro
 
+    .macro STACK_LOAD(%a, %b, %c, %d)
+        lw %a, 0($sp)
+        lw %b, 4($sp)
+        lw %c, 8($sp)
+        lw %d, 12($sp)
+        addi $sp, $sp, 16
+    .end_macro
+
 #
 # PROGRAM
 #
 
 .data
 
-    notesdebug: .word 1, 2, 3, 4, 3, 2, 1, 4, 3, 2, 1, 2, 3, 4, 0
+    notesdebug: .word 1, 1, 2, 2, 3, 3, 2, 4, 4, 3, 3, 2, 2, 1, 4, 4, 3, 3, 2, 2, 1, 4, 4, 3, 3, 2, 2, 1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 3, 3, 2, 2, 1, 0
+    ttls: .word 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 0
 
 .text
 
 main:
     CLEAR_SCREEN(COR_SCREEN)
     jal Gameloop
-    
+
     DONE
 
 
@@ -151,77 +170,64 @@ main:
 #
 FUNCTION_BEGIN Gameloop
 
-    STACK_SAVE($ra, $s0, $s1)
-    
+    STACK_SAVE($ra, $s0, $s1, $s2)
+
     # Load first note into $s1
     la $s1, notesdebug
-    
-    # INPUT
 
+    # Load TTLS into $s2
+    la $s2, ttls
+
+    # INPUT
     li $s0, USER_INPUT
-    
+
     j Gameloop.display
 Gameloop.input:
     # read user input
     lw $t1, 0($s0)
     beqz $t1, Gameloop.input
-    
+
     # reset user input to zero
     sw $zero, 0($s0)
-    
+
     # subtract '0' to obtain true number
     subi $t1, $t1, 48
-    
+
     # Test if user entered 1, 2, 3, or 4
     lw $t0, 0($s1)
-    beq $t1, $t0, Gameloop.correctInput
-    
-    # Invalid input, user lost
-    j Gameloop.failure
-      
-Gameloop.correctInput:
+    bne $t1, $t0, Gameloop.failure
 
-    # Check to see which note should be played
-    beq $t1, 1, Gameloop.ifEquals1
-    beq $t1, 2, Gameloop.ifEquals2
-    beq $t1, 3, Gameloop.ifEquals3
-    beq $t1, 4, Gameloop.ifEquals4
-    
-Gameloop.ifEquals1:
-    PLAY_NOTE(60)
-    j Gameloop.success
-Gameloop.ifEquals2:
-    PLAY_NOTE(62)
-    j Gameloop.success
-Gameloop.ifEquals3:
-    PLAY_NOTE(64)
-    j Gameloop.success
-Gameloop.ifEquals4:
-    PLAY_NOTE(65)
-    j Gameloop.success
+    #Play note
+    li $v0, 31
+    lw $a0, 0($s2)
+    li $a1, 1200
+    li $a2, 0
+    li $a3, 0x7F
+    syscall
 
-Gameloop.success:
+    # Go to next TTLS
+    addi $s2, $s2, 4
 
     # Go to next note
     addi $s1, $s1, 4
-    
+
     # If note is 0, then the song ended
     lw $t0, 0($s1)
-    beqz $t0, Gameloop.failure
-    
+    beqz $t0, Gameloop.endsong
+
     #
     # DISPLAY
     #
 Gameloop.display:
     CLEAR_SCREEN(COR_SCREEN)
-    
+
     # The logic to display the tiles in the correct column is:
     # (number of column - 1) * 8
     li $a2, COR_TILE
-    
+
     # Bottom row
     lw   $a0, 0($s1)
-    beqz $a0, Gameloop.next
+    beqz $a0, Gameloop.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 48
@@ -229,7 +235,7 @@ Gameloop.display:
 
     # Middle-Bottom row
     lw   $a0, 4($s1)
-    beqz $a0, Gameloop.next
+    beqz $a0, Gameloop.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 32
@@ -237,7 +243,7 @@ Gameloop.display:
 
     # Middle-Top row
     lw   $a0, 8($s1)
-    beqz $a0, Gameloop.next
+    beqz $a0, Gameloop.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 16
@@ -245,21 +251,26 @@ Gameloop.display:
 
     # Top row
     lw   $a0, 12($s1)
-    beqz $a0, Gameloop.next
+    beqz $a0, Gameloop.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     move $a1, $zero
     jal DrawRect
 
-Gameloop.next:
-
     j Gameloop.input
 
 Gameloop.failure:
 
-    CLEAR_SCREEN(0x00FF0000)
+    CLEAR_SCREEN(COR_FAIL)
+    j Gameloop.end
 
-    STACK_LOAD($ra, $s0, $s1)
+Gameloop.endsong:
+
+    CLEAR_SCREEN(COR_SUCCESS)
+
+Gameloop.end:
+
+    STACK_LOAD($ra, $s0, $s1, $s2)
 
 FUNCTION_END
 
@@ -314,4 +325,3 @@ DrawRect.endforloop2:
 DrawRect.endforloop1:
     STACK_LOAD($s0, $s1)
 FUNCTION_END
-
