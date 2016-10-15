@@ -266,6 +266,15 @@ Gameloop.display:
 Gameloop.failure:
 
     CLEAR_SCREEN(COR_FAIL)
+
+    # Play failure note
+    li   $v0, 31
+    li   $a0, 15
+    li   $a1, 5000
+    li   $a2, 0
+    li   $a3, 0x7F
+    syscall
+
     j    Gameloop.end
 
 Gameloop.success:
