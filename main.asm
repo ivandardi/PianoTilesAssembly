@@ -160,7 +160,7 @@
 main:
     CLEAR_SCREEN(COR_SCREEN)
     
-    la  $a0, hbty
+    la  $a0, ttls
     jal Gameloop
 
     DONE
@@ -216,7 +216,7 @@ Gameloop.input:
 
     # If tile is 0, then the song ended
     lw   $t0, 0($s1)
-    beqz $t0, Gameloop.endsong
+    beqz $t0, Gameloop.end
 
     #
     # DISPLAY
