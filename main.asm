@@ -1,6 +1,5 @@
-# PIANO TILES IN MIPS ASSEMBLY
 #
-# A tela e de 32 x 64
+# PIANO TILES IN MIPS ASSEMBLY
 #
 
 
@@ -74,15 +73,15 @@
 
     # Macro pra facilitar chamar a funcao de limpar a tela
     .macro CLEAR_SCREEN (%cor)
-        li $a0, %cor
+        li  $a0, %cor
         jal ClearScreen
     .end_macro
 
     # Macro pra facilitar chamar a funcao de desenhar retangulo
     .macro DRAW_RECT (%x, %y, %cor)
-        li $a0, %x
-        li $a1, %y
-        li $a2, %cor
+        li  $a0, %x
+        li  $a1, %y
+        li  $a2, %cor
         jal DrawRect
     .end_macro
 
@@ -96,53 +95,53 @@
     # Macros que facilitam salvar na pilha. Os registradores sao salvos em ordem
     .macro STACK_SAVE(%a)
         addi $sp, $sp, -4
-        sw %a, 0($sp)
+        sw   %a, 0($sp)
     .end_macro
 
     .macro STACK_SAVE(%a, %b)
         addi $sp, $sp, -8
-        sw %a, 0($sp)
-        sw %b, 4($sp)
+        sw   %a, 0($sp)
+        sw   %b, 4($sp)
     .end_macro
 
     .macro STACK_SAVE(%a, %b, %c)
         addi $sp, $sp, -12
-        sw %a, 0($sp)
-        sw %b, 4($sp)
-        sw %c, 8($sp)
+        sw   %a, 0($sp)
+        sw   %b, 4($sp)
+        sw   %c, 8($sp)
     .end_macro
 
     .macro STACK_SAVE(%a, %b, %c, %d)
         addi $sp, $sp, -16
-        sw %a, 0($sp)
-        sw %b, 4($sp)
-        sw %c, 8($sp)
-        sw %d, 12($sp)
+        sw   %a, 0($sp)
+        sw   %b, 4($sp)
+        sw   %c, 8($sp)
+        sw   %d, 12($sp)
     .end_macro
 
     .macro STACK_LOAD(%a)
-        lw %a, 0($sp)
+        lw   %a, 0($sp)
         addi $sp, $sp, 4
     .end_macro
 
     .macro STACK_LOAD(%a, %b)
-        lw %a, 0($sp)
-        lw %b, 4($sp)
+        lw   %a, 0($sp)
+        lw   %b, 4($sp)
         addi $sp, $sp, 8
     .end_macro
 
     .macro STACK_LOAD(%a, %b, %c)
-        lw %a, 0($sp)
-        lw %b, 4($sp)
-        lw %c, 8($sp)
+        lw   %a, 0($sp)
+        lw   %b, 4($sp)
+        lw   %c, 8($sp)
         addi $sp, $sp, 12
     .end_macro
 
     .macro STACK_LOAD(%a, %b, %c, %d)
-        lw %a, 0($sp)
-        lw %b, 4($sp)
-        lw %c, 8($sp)
-        lw %d, 12($sp)
+        lw   %a, 0($sp)
+        lw   %b, 4($sp)
+        lw   %c, 8($sp)
+        lw   %d, 12($sp)
         addi $sp, $sp, 16
     .end_macro
 
@@ -152,16 +151,16 @@
 
 .data
 
-    tiles: .space 51
     ttls: .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
     hbty: .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
+    tiles: .space 51
 
 .text
 
 main:
     CLEAR_SCREEN(COR_SCREEN)
     
-    la $a0, hbty
+    la  $a0, hbty
     jal Gameloop
 
     DONE
@@ -173,42 +172,40 @@ main:
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
 FUNCTION_BEGIN Gameloop
 
-    STACK_SAVE($ra, $s0, $s1, $s2)
-
-    # Load random tiles into $s1
-    jal CreateRandomTiles
-    la $s1, tiles
-
-    # Load TTLS into $s2
+    # Load song into $s2
     move $s2, $a0
     # Skip size
     addi $s2, $s2, 4
 
-    # INPUT
-    li $s0, USER_INPUT
+    # Load random tiles into $s1
+    jal  CreateRandomTiles
+    la   $s1, tiles
 
-    j Gameloop.display
+    # INPUT
+    li   $s0, USER_INPUT
+
+    j    Gameloop.display
 Gameloop.input:
     # read user input
-    lw $t1, 0($s0)
-    beqz $t1, Gameloop.input
+    lw   $t0, 0($s0)
+    beqz $t0, Gameloop.input
 
     # reset user input to zero
-    sw $zero, 0($s0)
+    sw   $zero, 0($s0)
 
     # subtract '0' to obtain true number
-    subi $t1, $t1, 48
+    addi $t0, $t0, -48
 
     # Test if user entered 1, 2, 3, or 4
-    lw $t0, 0($s1)
-    bne $t1, $t0, Gameloop.failure
+    lw   $t1, 0($s1)
+    bne  $t0, $t1, Gameloop.failure
 
     # Play note
-    li $v0, 31
-    lw $a0, 0($s2)
-    li $a1, 1500
-    li $a2, 0
-    li $a3, 0x7F
+    li   $v0, 31
+    lw   $a0, 0($s2)
+    li   $a1, 1500
+    li   $a2, 0
+    li   $a3, 0x7F
     syscall
 
     # Go to next note
@@ -218,7 +215,7 @@ Gameloop.input:
     addi $s1, $s1, 4
 
     # If tile is 0, then the song ended
-    lw $t0, 0($s1)
+    lw   $t0, 0($s1)
     beqz $t0, Gameloop.endsong
 
     #
@@ -229,7 +226,7 @@ Gameloop.display:
 
     # The logic to display the tiles in the correct column is:
     # (number of column - 1) * 8
-    li $a2, COR_TILE
+    li   $a2, COR_TILE
 
     # Bottom row
     lw   $a0, 0($s1)
@@ -237,7 +234,7 @@ Gameloop.display:
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 48
-    jal DrawRect
+    jal  DrawRect
 
     # Middle-Bottom row
     lw   $a0, 4($s1)
@@ -245,7 +242,7 @@ Gameloop.display:
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 32
-    jal DrawRect
+    jal  DrawRect
 
     # Middle-Top row
     lw   $a0, 8($s1)
@@ -253,7 +250,7 @@ Gameloop.display:
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 16
-    jal DrawRect
+    jal  DrawRect
 
     # Top row
     lw   $a0, 12($s1)
@@ -261,22 +258,20 @@ Gameloop.display:
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     move $a1, $zero
-    jal DrawRect
+    jal  DrawRect
 
-    j Gameloop.input
+    j    Gameloop.input
 
 Gameloop.failure:
 
     CLEAR_SCREEN(COR_FAIL)
-    j Gameloop.end
+    j    Gameloop.end
 
 Gameloop.endsong:
 
     CLEAR_SCREEN(COR_SUCCESS)
 
 Gameloop.end:
-
-    STACK_LOAD($ra, $s0, $s1, $s2)
 
 FUNCTION_END
 
@@ -287,46 +282,46 @@ FUNCTION_BEGIN CreateRandomTiles
     STACK_SAVE($s0, $s1, $s2, $a0)
     
     # Get length of song
-    lw    $s2, 0($a0)
+    lw   $s2, 0($a0)
     
     # Get the current time
-    li    $v0, 30
+    li   $v0, 30
     syscall
     
     # Set the rgn seed with the current time
-    li    $v0, 40
-    move  $a1, $a0
-    xor   $a0, $a0, $a0
+    li   $v0, 40
+    move $a1, $a0
+    xor  $a0, $a0, $a0
     syscall
 
     # Load upper range of the rgn
-    li    $v0, 42
-    li    $a1, 4
+    li   $v0, 42
+    li   $a1, 4
             
-    la    $s0, tiles        # iterator
+    la   $s0, tiles  # iterator
     
     # Calculate end value for the loop
-    rol   $s2, $s2, 2
-    add   $s1, $s0, $s2
+    rol  $s2, $s2, 2
+    add  $s1, $s0, $s2
 CreateRandomTiles.forloop:
-    beq   $s0, $s1, CreateRandomTiles.endforloop
+    beq  $s0, $s1, CreateRandomTiles.endforloop
     
     # Get random number in interval [0, 3]
-    xor   $a0, $a0, $a0
+    xor  $a0, $a0, $a0
     syscall
     
     # Add 1 to get [1, 4]
-    addi  $a0, $a0, 1
+    addi $a0, $a0, 1
     
     # Write to the vector
-    sw    $a0, 0($s0)
+    sw   $a0, 0($s0)
     
-    addi  $s0, $s0, 4       # Increment %s0 by 4
-    j     CreateRandomTiles.forloop
+    addi $s0, $s0, 4       # Increment %s0 by 4
+    j    CreateRandomTiles.forloop
 CreateRandomTiles.endforloop:
 
     # Add the 0 terminator to the stream of tiles
-    sw    $zero, 0($s0)   
+    sw   $zero, 0($s0)   
     
     STACK_LOAD($s0, $s1, $s2, $a0)
 FUNCTION_END
