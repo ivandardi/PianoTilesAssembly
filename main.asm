@@ -152,8 +152,9 @@
 
 .data
 
+    tiles: .space 51
     notesdebug: .word 1, 1, 2, 2, 3, 3, 2, 4, 4, 3, 3, 2, 2, 1, 4, 4, 3, 3, 2, 2, 1, 4, 4, 3, 3, 2, 2, 1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 3, 3, 2, 2, 1, 0
-    ttls: .word 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 0
+    ttls: .word 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
 
 .text
 
@@ -172,7 +173,8 @@ FUNCTION_BEGIN Gameloop
 
     STACK_SAVE($ra, $s0, $s1, $s2)
 
-    # Load first note into $s1
+    # Load random tiles into $s1
+    jal CreateRandomTiles
     la $s1, notesdebug
 
     # Load TTLS into $s2
@@ -200,18 +202,18 @@ Gameloop.input:
     # Play note
     li $v0, 31
     lw $a0, 0($s2)
-    li $a1, 1200
+    li $a1, 1500
     li $a2, 0
     li $a3, 0x7F
     syscall
 
-    # Go to next TTLS
+    # Go to next note
     addi $s2, $s2, 4
 
-    # Go to next note
+    # Go to next tile
     addi $s1, $s1, 4
 
-    # If note is 0, then the song ended
+    # If tile is 0, then the song ended
     lw $t0, 0($s1)
     beqz $t0, Gameloop.endsong
 
@@ -276,18 +278,65 @@ FUNCTION_END
 
 
 
+FUNCTION_BEGIN CreateRandomTiles
+    STACK_SAVE($s0, $s1)
+    
+    # Get the current time
+    li    $v0, 30
+    syscall
+    
+    # Set the rgn seed with the current time
+    li    $v0, 40
+    move  $a1, $a0
+    xor   $a0, $a0, $a0
+    syscall
+
+    # Load upper range of the rgn
+    li    $v0, 42
+    li    $a1, 4
+            
+    la    $s0, tiles        # iterator
+    
+    li    $t0, 55
+    rol   $t0, $t0, 2
+    add   $s1, $s0, $t0     # end value of the for loop
+CreateRandomTiles.forloop:
+    beq   $s0, $s1, CreateRandomTiles.endforloop
+    
+    # Get random number in interval [0, 3]
+    xor   $a0, $a0, $a0
+    syscall
+    
+    # Add 1 to get [1, 4]
+    addi  $a0, $a0, 1
+    
+    # Write to the vector
+    sw    $a0, 0($s0)
+    
+    addi  $s0, $s0, 4       # Increment %s0 by 4
+    j     CreateRandomTiles.forloop
+CreateRandomTiles.endforloop:
+
+    # Add the 0 terminator to the stream of tiles
+    sw    $zero, 0($s0)   
+    
+    STACK_LOAD($s0, $s1)
+FUNCTION_END
+
+
+
 # Funcao de limpar a tela
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
     STACK_SAVE($s0, $s1)
     li    $s0, SCREEN_BEGIN # iterator
     li    $s1, SCREEN_END   # end value of the for loop
-.forloop:
-    beq   $s0, $s1, .endforloop
+ClearScreen.forloop:
+    beq   $s0, $s1, ClearScreen.endforloop
     sw    $a0, 0($s0)       # Set $s0 to the color stored in $a0
-    addiu $s0, $s0, 4       # Increment %s0 by 4
-    j     .forloop
-.endforloop:
+    addi  $s0, $s0, 4       # Increment %s0 by 4
+    j     ClearScreen.forloop
+ClearScreen.endforloop:
     STACK_LOAD($s0, $s1)
 FUNCTION_END
 
