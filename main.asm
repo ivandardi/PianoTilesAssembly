@@ -160,7 +160,7 @@
 main:
     CLEAR_SCREEN(COR_SCREEN)
     
-    la  $a0, hbty
+    la  $a0, ttls
     jal Gameloop
 
     DONE
@@ -171,6 +171,7 @@ main:
 #
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
 FUNCTION_BEGIN Gameloop
+    STACK_SAVE($ra, $s0, $s1, $s2) 
 
     # Load song into $s2
     move $s2, $a0
@@ -216,7 +217,7 @@ Gameloop.input:
 
     # If tile is 0, then the song ended
     lw   $t0, 0($s1)
-    beqz $t0, Gameloop.endsong
+    beqz $t0, Gameloop.success
 
     #
     # DISPLAY
@@ -267,12 +268,12 @@ Gameloop.failure:
     CLEAR_SCREEN(COR_FAIL)
     j    Gameloop.end
 
-Gameloop.endsong:
+Gameloop.success:
 
     CLEAR_SCREEN(COR_SUCCESS)
 
 Gameloop.end:
-
+    STACK_LOAD($ra, $s0, $s1, $s2) 
 FUNCTION_END
 
 
