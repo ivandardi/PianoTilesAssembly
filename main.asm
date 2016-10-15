@@ -153,13 +153,15 @@
 .data
 
     tiles: .space 51
-    notesdebug: .word 1, 1, 2, 2, 3, 3, 2, 4, 4, 3, 3, 2, 2, 1, 4, 4, 3, 3, 2, 2, 1, 4, 4, 3, 3, 2, 2, 1, 1, 1, 2, 2, 3, 3, 2, 4, 4, 3, 3, 2, 2, 1, 0
-    ttls: .word 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
+    ttls: .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
+    hbty: .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
 
 .text
 
 main:
     CLEAR_SCREEN(COR_SCREEN)
+    
+    la $a0, hbty
     jal Gameloop
 
     DONE
@@ -168,17 +170,19 @@ main:
 
 # Funcao do gameloop
 #
-#
+# $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
 FUNCTION_BEGIN Gameloop
 
     STACK_SAVE($ra, $s0, $s1, $s2)
 
     # Load random tiles into $s1
     jal CreateRandomTiles
-    la $s1, notesdebug
+    la $s1, tiles
 
     # Load TTLS into $s2
-    la $s2, ttls
+    move $s2, $a0
+    # Skip size
+    addi $s2, $s2, 4
 
     # INPUT
     li $s0, USER_INPUT
@@ -277,9 +281,13 @@ Gameloop.end:
 FUNCTION_END
 
 
-
+# Funcao de criar tiles aleatorias
+# $a0: Endereco da musica
 FUNCTION_BEGIN CreateRandomTiles
-    STACK_SAVE($s0, $s1)
+    STACK_SAVE($s0, $s1, $s2, $a0)
+    
+    # Get length of song
+    lw    $s2, 0($a0)
     
     # Get the current time
     li    $v0, 30
@@ -297,9 +305,9 @@ FUNCTION_BEGIN CreateRandomTiles
             
     la    $s0, tiles        # iterator
     
-    li    $t0, 55
-    rol   $t0, $t0, 2
-    add   $s1, $s0, $t0     # end value of the for loop
+    # Calculate end value for the loop
+    rol   $s2, $s2, 2
+    add   $s1, $s0, $s2
 CreateRandomTiles.forloop:
     beq   $s0, $s1, CreateRandomTiles.endforloop
     
@@ -320,7 +328,7 @@ CreateRandomTiles.endforloop:
     # Add the 0 terminator to the stream of tiles
     sw    $zero, 0($s0)   
     
-    STACK_LOAD($s0, $s1)
+    STACK_LOAD($s0, $s1, $s2, $a0)
 FUNCTION_END
 
 
