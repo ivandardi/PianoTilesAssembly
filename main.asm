@@ -316,12 +316,17 @@ FUNCTION_BEGIN CreateRandomTiles
 CreateRandomTiles.forloop:
     beq  $s0, $s1, CreateRandomTiles.endforloop
     
+CreateRandomTiles.retryunique:
     # Get random number in interval [0, 3]
     xor  $a0, $a0, $a0
     syscall
     
     # Add 1 to get [1, 4]
     addi $a0, $a0, 1
+
+    # Ensure that the new tile isn't the same as the previous one
+    lw   $t0, -4($s0)
+    beq  $t0, $a0, CreateRandomTiles.retryunique
     
     # Write to the vector
     sw   $a0, 0($s0)
