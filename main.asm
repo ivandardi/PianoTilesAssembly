@@ -1,6 +1,6 @@
 # PIANO TILES IN MIPS ASSEMBLY
 #
-# A tela é de 32 x 64
+# A tela ï¿½ de 32 x 64
 #
 
 
@@ -50,18 +50,18 @@
 # MACROS
 #
 
-    # Macro que para a execução do programa
+    # Macro que para a execuï¿½ï¿½o do programa
     .macro DONE
         li $v0,10
         syscall
     .end_macro
 
-    # Macro de início de função
+    # Macro de inï¿½cio de funï¿½ï¿½o
     .macro FUNCTION_BEGIN (%name)
         %name :
     .end_macro
 
-    # Macro de fim de função
+    # Macro de fim de funï¿½ï¿½o
     .macro FUNCTION_END
         jr $ra
     .end_macro
@@ -104,49 +104,51 @@
         li $a0, %ms
         syscall
     .end_macro
+    
+    .macro OPEN_FILE(%ad, %flag, %mode)
+        li   $v0, 13       	# system call for open file
+  	la   $a0, %ad     	# output file name
+  	li   $a1, %flag       	# Open for writing (flags are 0: read, 1: write)
+  	li   $a2, %mode      	# mode is ignored
+  	syscall		        # open a file (file descriptor returned in $v0)
+    .end_macro
+    
+    .macro CLOSE_FILE(%file)
+        li   $v0, 16       # system call for close file
+  	move $a0, %file     # file descriptor to close
+  	syscall            # close file
+    .end_macro
+    
+    .macro PRINTF(%ad, %n)
+        li $v0, 55
+    	la $a0, %ad
+    	li $a1, %n
+    	syscall
+    .end_macro
 
 #
 # PROGRAM
 #
 
 .data
-
+	teste: .asciiz "tela1.txt" # filename
+	buffer: .asciiz "ola"
+	
+	
 .text
 
 main:
     
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 0, COR_BLACK)
-    DRAW_RECT(8, 16, COR_BLACK)
-    DRAW_RECT(16, 32, COR_BLACK)
-    DRAW_RECT(24, 48, COR_BLACK)
-    PLAY_NOTE(72)
-    SLEEP(1000)
+    	CLEAR_SCREEN(COR_WHITE)
+    	
+    	OPEN_FILE(teste,0,0)
+  	move $s6, $v0      # save the file descriptor
+ 
+    	CLOSE_FILE($s6)
     
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 16, COR_BLACK)
-    DRAW_RECT(8, 32, COR_BLACK)
-    DRAW_RECT(16, 48, COR_BLACK)
-    PLAY_NOTE(70)
-    SLEEP(1000)
-    
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 32, COR_BLACK)
-    DRAW_RECT(8, 48, COR_BLACK)
-    PLAY_NOTE(69)
-    SLEEP(1000)
+    	PRINTF(buffer,1)
 
-    CLEAR_SCREEN(COR_WHITE)
-    DRAW_RECT(0, 48, COR_BLACK)
-    PLAY_NOTE(67)
-    SLEEP(1000)
-    
-    CLEAR_SCREEN(COR_WHITE)
-    PLAY_NOTE(65)
-    SLEEP(1000)
-
-    DRAW_PIXEL(0, 0, COR_BLACK)
-      
+          
     DONE
 
 
@@ -160,7 +162,7 @@ FUNCTION_END
 
 
 
-# Função de limpar a tela
+# Funï¿½ï¿½o de limpar a tela
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
     li    $t0, SCREEN_BEGIN # iterator
