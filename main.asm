@@ -93,25 +93,25 @@
     .end_macro
 
     # Macros que facilitam salvar na pilha. Os registradores sao salvos em ordem
-    .macro STACK_SAVE(%a)
+    .macro STACK_PUSH(%a)
         addi $sp, $sp, -4
         sw   %a, 0($sp)
     .end_macro
 
-    .macro STACK_SAVE(%a, %b)
+    .macro STACK_PUSH(%a, %b)
         addi $sp, $sp, -8
         sw   %a, 0($sp)
         sw   %b, 4($sp)
     .end_macro
 
-    .macro STACK_SAVE(%a, %b, %c)
+    .macro STACK_PUSH(%a, %b, %c)
         addi $sp, $sp, -12
         sw   %a, 0($sp)
         sw   %b, 4($sp)
         sw   %c, 8($sp)
     .end_macro
 
-    .macro STACK_SAVE(%a, %b, %c, %d)
+    .macro STACK_PUSH(%a, %b, %c, %d)
         addi $sp, $sp, -16
         sw   %a, 0($sp)
         sw   %b, 4($sp)
@@ -119,25 +119,25 @@
         sw   %d, 12($sp)
     .end_macro
 
-    .macro STACK_LOAD(%a)
+    .macro STACK_POP(%a)
         lw   %a, 0($sp)
         addi $sp, $sp, 4
     .end_macro
 
-    .macro STACK_LOAD(%a, %b)
+    .macro STACK_POP(%a, %b)
         lw   %a, 0($sp)
         lw   %b, 4($sp)
         addi $sp, $sp, 8
     .end_macro
 
-    .macro STACK_LOAD(%a, %b, %c)
+    .macro STACK_POP(%a, %b, %c)
         lw   %a, 0($sp)
         lw   %b, 4($sp)
         lw   %c, 8($sp)
         addi $sp, $sp, 12
     .end_macro
 
-    .macro STACK_LOAD(%a, %b, %c, %d)
+    .macro STACK_POP(%a, %b, %c, %d)
         lw   %a, 0($sp)
         lw   %b, 4($sp)
         lw   %c, 8($sp)
@@ -159,8 +159,8 @@
 
 main:
     CLEAR_SCREEN(COR_SCREEN)
-    
-    la  $a0, ttls
+
+    la  $a0, hbty
     jal Gameloop
 
     DONE
@@ -171,7 +171,7 @@ main:
 #
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
 FUNCTION_BEGIN Gameloop
-    STACK_SAVE($ra, $s0, $s1, $s2) 
+    STACK_PUSH($ra, $s0, $s1, $s2)
 
     # Load song into $s2
     move $s2, $a0
@@ -282,22 +282,22 @@ Gameloop.success:
     CLEAR_SCREEN(COR_SUCCESS)
 
 Gameloop.end:
-    STACK_LOAD($ra, $s0, $s1, $s2) 
+    STACK_POP($ra, $s0, $s1, $s2)
 FUNCTION_END
 
 
 # Funcao de criar tiles aleatorias
 # $a0: Endereco da musica
 FUNCTION_BEGIN CreateRandomTiles
-    STACK_SAVE($s0, $s1, $s2, $a0)
-    
+    STACK_PUSH($s0, $s1, $s2, $a0)
+
     # Get length of song
     lw   $s2, 0($a0)
-    
+
     # Get the current time
     li   $v0, 30
     syscall
-    
+
     # Set the rgn seed with the current time
     li   $v0, 40
     move $a1, $a0
@@ -307,38 +307,38 @@ FUNCTION_BEGIN CreateRandomTiles
     # Load upper range of the rgn
     li   $v0, 42
     li   $a1, 4
-            
+
     la   $s0, tiles  # iterator
-    
+
     # Calculate end value for the loop
     rol  $s2, $s2, 2
     add  $s1, $s0, $s2
 CreateRandomTiles.forloop:
     beq  $s0, $s1, CreateRandomTiles.endforloop
-    
+
 CreateRandomTiles.retryunique:
     # Get random number in interval [0, 3]
     xor  $a0, $a0, $a0
     syscall
-    
+
     # Add 1 to get [1, 4]
     addi $a0, $a0, 1
 
     # Ensure that the new tile isn't the same as the previous one
     lw   $t0, -4($s0)
     beq  $t0, $a0, CreateRandomTiles.retryunique
-    
+
     # Write to the vector
     sw   $a0, 0($s0)
-    
+
     addi $s0, $s0, 4       # Increment %s0 by 4
     j    CreateRandomTiles.forloop
 CreateRandomTiles.endforloop:
 
     # Add the 0 terminator to the stream of tiles
-    sw   $zero, 0($s0)   
-    
-    STACK_LOAD($s0, $s1, $s2, $a0)
+    sw   $zero, 0($s0)
+
+    STACK_POP($s0, $s1, $s2, $a0)
 FUNCTION_END
 
 
@@ -346,7 +346,7 @@ FUNCTION_END
 # Funcao de limpar a tela
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
-    STACK_SAVE($s0, $s1)
+    STACK_PUSH($s0, $s1)
     li    $s0, SCREEN_BEGIN # iterator
     li    $s1, SCREEN_END   # end value of the for loop
 ClearScreen.forloop:
@@ -355,7 +355,7 @@ ClearScreen.forloop:
     addi  $s0, $s0, 4       # Increment %s0 by 4
     j     ClearScreen.forloop
 ClearScreen.endforloop:
-    STACK_LOAD($s0, $s1)
+    STACK_POP($s0, $s1)
 FUNCTION_END
 
 
@@ -365,7 +365,7 @@ FUNCTION_END
 # $a1: y
 # $a2: cor
 FUNCTION_BEGIN DrawRect
-    STACK_SAVE($s0, $s1)
+    STACK_PUSH($s0, $s1)
     add  $s0, $a0, RECT_WIDTH  # Stop condition variable
     add  $s1, $a1, RECT_HEIGHT # Stop condition variable
 DrawRect.forloop1:
@@ -390,5 +390,36 @@ DrawRect.endforloop2:
     addi $a1, $a1, 1                    # i++
     j DrawRect.forloop1
 DrawRect.endforloop1:
-    STACK_LOAD($s0, $s1)
+    STACK_POP($s0, $s1)
+FUNCTION_END
+
+
+
+# Funcao que copia um arquivo para a tela
+# $a0: string terminada em nulo com o nome do arquivo
+FUNCTION_BEGIN ScreenImage
+    STACK_PUSH($s0)
+
+    # Open file ($a0 already has the filename)
+    li   $v0, 13       # Open file code
+    xor  $a1, $a1, $a1 # Open for reading (flags are 0: read, 1: write)
+    xor  $a2, $a2, $a2 # Mode is ignored
+    syscall
+
+    # Move file to $s0
+    move $s0, $v0
+
+    # Copy from file to screen
+    li   $v0, 14           # Read file code
+    move $a0, $s0
+    la   $a1, SCREEN_BEGIN # Address of screen
+    li   $a2, 8192         # Amount of characters to read
+    syscall
+
+    # Close the file
+    li   $v0, 16  # Close file code
+    move $a0, $s0 # File to be closed
+    syscall
+
+    STACK_POP($s0)
 FUNCTION_END
