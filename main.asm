@@ -100,6 +100,12 @@
         syscall
     .end_macro
         
+    # Macro pra desenhar na tela
+    .macro SCREEN_IMAGE(%arq)
+        la $a0, %arq
+        jal ScreenImage
+    .end_macro
+        
     # Macros que facilitam salvar na pilha. Os registradores sao salvos em ordem
     .macro STACK_PUSH(%a)
         addi $sp, $sp, -4
@@ -159,23 +165,107 @@
 
 .data
 
-	teste: .asciiz "tela1.txt" # filename
-	buffer: .asciiz "ola"
+    tela1: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_01.img"
+    tela2: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_02.img"
+    tela3: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_03.img"
 	
-	ttls: .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
+    ttls: .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
     hbty: .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
     tiles: .space 51
 
 .text
 
+
+
 main:
-    CLEAR_SCREEN(COR_SCREEN)
 
-    la  $a0, hbty
-    jal Gameloop
+    jal MainScreen
 
+    
+
+#    CLEAR_SCREEN(COR_SCREEN)
+
+#    la  $a0, hbty
+#    jal Gameloop
           
-    DONE
+DONE
+
+
+
+FUNCTION_BEGIN MainScreen
+    STACK_PUSH($ra, $s0, $s1, $s2)
+    
+    SCREEN_IMAGE(tela1)
+    
+    # INPUT
+    li $s0, USER_INPUT
+    
+    li $s1, 1  # Set $s1 to 1. $s1 is the position
+    
+MainScreen.input:
+    # read user input
+    lw   $s2, 0($s0)
+    beqz $s2, MainScreen.input
+    
+    # reset user input to zero
+    sw   $zero, 0($s0)
+    
+    # $s2 has the user input
+    
+    # Check to see if the user pressed w or W
+    beq $s2, 119, MainScreen.w
+    beq $s2, 87, MainScreen.w
+    
+    # Check to see if the user pressed s or S
+    beq $s2, 115, MainScreen.s
+    beq $s2, 83, MainScreen.s
+    
+    # Check to see if the user pressed enter
+    beq $s2, 10, MainScreen.enter
+    
+    j MainScreen.input
+	
+MainScreen.w:
+
+    beq  $s1, 1, MainScreen.input
+    addi $s1, $s1, -1
+    
+    j MainScreen.screen
+
+MainScreen.s:    
+
+    beq  $s1, 3, MainScreen.input
+    addi $s1, $s1, 1
+    
+    j MainScreen.screen    
+    
+MainScreen.screen:
+    
+    beq $s1, 1, MainScreen.tela1
+    beq $s1, 2, MainScreen.tela2
+    beq $s1, 3, MainScreen.tela3
+    
+MainScreen.tela1:
+
+    SCREEN_IMAGE(tela1)
+    j MainScreen.input
+
+MainScreen.tela2:
+
+    SCREEN_IMAGE(tela2)
+    j MainScreen.input
+
+MainScreen.tela3:
+    
+    SCREEN_IMAGE(tela3)
+    j MainScreen.input
+    
+MainScreen.enter:
+
+    move $v0, $s1
+
+    STACK_POP($ra, $s0, $s1, $s2)
+FUNCTION_END
 
 
 
