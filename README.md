@@ -23,10 +23,4 @@ Clone do jogo "Piano Tiles" em MIPS Assembly para o projeto final de Arquitetura
 
 ## Controls
 
-The piano tiles can be played by pressing the keys respective to the column that has a black tile currently at the bottom.
-
-```
-Column | 1 | 2 | 3 | 4 |
-       -----------------
-Key    | f | g | h | j |
-```
+The piano tiles can be played by pressing the number keys respective to the column.
