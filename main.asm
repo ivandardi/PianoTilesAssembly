@@ -15,8 +15,11 @@
     .eqv SCREEN_END 0x10044000
 
     # Largura do retangulo do piano
-    .eqv RECT_WIDTH 8
+    .eqv RECT_WIDTH_4T 8
 
+    # Largura do retangulo do piano
+    .eqv RECT_WIDTH_8T 4
+    
     # Altura do retangulo do piano
     .eqv RECT_HEIGHT 16
 
@@ -85,14 +88,6 @@
         jal DrawRect
     .end_macro
     
-    # Macro para facilitar chamar a funcao de desenhar pixel
-    .macro DRAW_PIXEL (%x, %y, %cor)
-        li $a0, %x
-        li $a1, %y
-        li $a2, %cor
-        jal DrawPixel
-    .end_macro
-
     # Macro que faz o programa esperar por %ms milissegundos
     .macro SLEEP(%ms)
         li $v0, 32
@@ -132,6 +127,15 @@
         sw   %c, 8($sp)
         sw   %d, 12($sp)
     .end_macro
+    
+    .macro STACK_PUSH(%a, %b, %c, %d, %e)
+        addi $sp, $sp, -20
+        sw   %a, 0($sp)
+        sw   %b, 4($sp)
+        sw   %c, 8($sp)
+        sw   %d, 12($sp)
+        sw   %e, 16($sp)
+    .end_macro
 
     .macro STACK_POP(%a)
         lw   %a, 0($sp)
@@ -159,6 +163,17 @@
         addi $sp, $sp, 16
     .end_macro
 
+    .macro STACK_POP(%a, %b, %c, %d, %e)
+        lw   %a, 0($sp)
+        lw   %b, 4($sp)
+        lw   %c, 8($sp)
+        lw   %d, 12($sp)
+        lw   %e, 16($sp)
+        addi $sp, $sp, 20
+    .end_macro
+
+
+
 #
 # PROGRAM
 #
@@ -168,9 +183,9 @@
     tela1: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_01.img"
     tela2: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_02.img"
     tela3: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_03.img"
-	
-    ttls: .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
-    hbty: .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
+
+    ttls:  .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
+    hbty:  .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
     tiles: .space 51
 
 .text
@@ -179,20 +194,54 @@
 
 main:
 
-    jal MainScreen
+    jal MainLoop
 
-    
-
-#    CLEAR_SCREEN(COR_SCREEN)
-
-#    la  $a0, hbty
-#    jal Gameloop
           
 DONE
 
 
 
-FUNCTION_BEGIN MainScreen
+FUNCTION_BEGIN MainLoop #Control Setup and Game flow
+    STACK_PUSH($ra)
+    
+    jal MainScreen
+    
+MainLoop.loop:
+   
+    # If $v0 is 1, then play with 4 columns of tiles
+    beq $v0, 0, MainLoop.loop.0 # initial
+    beq $v0, 1, MainLoop.loop.1 # select music 4 tiles
+    beq $v0, 2, MainLoop.loop.2 # select music 8 tiles
+    beq $v0, 3, MainLoop.loop.3 # information
+    beq $v0, 4, MainLoop.loop.4 # music 1 - 4 tiles
+    beq $v0, 5, MainLoop.loop.5 # music 2 - 4 tiles
+    beq $v0, 6, MainLoop.loop.6 # music 3 - 4 tiles
+    beq $v0, 7, MainLoop.loop.7 # music 4 - 4 tiles
+    beq $v0, 8, MainLoop.loop.8 # music 5 - 4 tiles
+    beq $v0, 9, MainLoop.loop.9 # music 1 - 8 tiles
+    beq $v0, 10, MainLoop.loop.10 # music 2 - 8 tiles
+    beq $v0, 11, MainLoop.loop.11 # music 3 - 8 tiles
+    beq $v0, 12, MainLoop.loop.12 # music 4 - 8 tiles
+    beq $v0, 13, MainLoop.loop.13 # music 5 - 8 tiles
+    beq $v0, 14, MainLoop.loop.14 # success - 4 tiles
+    beq $v0, 15, MainLoop.loop.15 # success - 8 tiles
+    beq $v0, 16, MainLoop.loop.16 # fail - 4 tiles
+    beq $v0, 17, MainLoop.loop.17 # fail - 8 tiles
+
+MainLoop.loop.1:
+
+    
+
+    #j MainLoop.loop
+	
+MainLoop.end:
+
+    STACK_POP($ra)
+FUNCTION_END
+
+
+
+FUNCTION_BEGIN MainScreen #Position Code: 0
     STACK_PUSH($ra, $s0, $s1, $s2)
     
     SCREEN_IMAGE(tela1)
@@ -269,10 +318,147 @@ FUNCTION_END
 
 
 
-# Funcao do gameloop
+FUNCTION_BEGIN InfoScreen #Position Code: 3
+    STACK_PUSH($ra, $s0, $s2)
+    
+    SCREEN_IMAGE(tela2)
+    
+    # INPUT
+    li $s0, USER_INPUT
+        
+InfoScreen.input:
+    # read user input
+    lw   $s2, 0($s0)
+    beqz $s2, InfoScreen.input
+    
+    # reset user input to zero
+    sw   $zero, 0($s0)
+    
+    # $s2 has the user input
+    
+    # Check to see if the user pressed ESC
+    beq $s2, 27, InfoScreen.back
+    
+    # Check to see if the user pressed BackSpace
+    beq $s2, 8, InfoScreen.back
+    
+
+    j InfoScreen.input
+	
+InfoScreen.back:
+
+    li $v0, 1
+
+    STACK_POP($ra, $s0, $s2)
+FUNCTION_END
+
+
+
+FUNCTION_BEGIN SelectionScreen #Position Code: 1 or 2, paratemer
+    STACK_PUSH($ra, $s0, $s1, $s2)
+    
+    SCREEN_IMAGE(tela2)
+    
+    # INPUT
+    li $s0, USER_INPUT
+    
+    li $s1, 4  # Set $s1 to 4. $s1 is the position
+    
+SelectionScreen.input:
+    # read user input
+    lw   $s2, 0($s0)
+    beqz $s2, SelectionScreen.input
+    
+    # reset user input to zero
+    sw   $zero, 0($s0)
+    
+    # $s2 has the user input
+    
+    # Check to see if the user pressed ESC
+    beq $s2, 27, SelectionScreen.back
+    
+    # Check to see if the user pressed BackSpace
+    beq $s2, 8, SelectionScreen.back
+    
+    # Check to see if the user pressed w or W
+    beq $s2, 119, SelectionScreen.w
+    beq $s2, 87, SelectionScreen.w
+    
+    # Check to see if the user pressed s or S
+    beq $s2, 115, SelectionScreen.s
+    beq $s2, 83, SelectionScreen.s
+    
+    # Check to see if the user pressed enter
+    beq $s2, 10, SelectionScreen.enter
+    
+    j SelectionScreen.input
+    
+SelectionScreen.w:
+
+    beq  $s1, 4, SelectionScreen.input
+    addi $s1, $s1, -1
+    
+    j MainScreen.screen
+
+SelectionScreen.s:    
+
+    beq  $s1, 8, SelectionScreen.input
+    addi $s1, $s1, 1
+    
+    j MainScreen.screen    
+    
+SelectionScreen.screen:
+    
+    beq $s1, 4, SelectionScreen.tela4
+    beq $s1, 5, SelectionScreen.tela5
+    beq $s1, 6, SelectionScreen.tela6
+    beq $s1, 7, SelectionScreen.tela7
+    beq $s1, 8, SelectionScreen.tela8
+    
+SelectionScreen.tela4:
+
+    SCREEN_IMAGE(tela1)
+    j SelectionScreen.input
+
+SelectionScreen.tela5:
+
+    SCREEN_IMAGE(tela2)
+    j SelectionScreen.input
+
+SelectionScreen.tela6:
+    
+    SCREEN_IMAGE(tela3)
+    j SelectionScreen.input
+    
+SelectionScreen.tela7:
+
+    SCREEN_IMAGE(tela1)
+    j SelectionScreen.input
+
+SelectionScreen.tela8:
+
+    SCREEN_IMAGE(tela2)
+    j SelectionScreen.input   
+
+	
+				
+SelectionScreen.back:
+    li $s1, 0
+    j SelectionScreen.end
+SelectionScreen.enter:
+    
+SelectionScreen.end:
+    move $v0, $s1
+
+    STACK_POP($ra, $s0, $s1, $s2)
+FUNCTION_END
+
+
+
+# Funcao do gameloop para 4 colunas de tiles
 #
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
-FUNCTION_BEGIN Gameloop
+FUNCTION_BEGIN Gameloop4 #Posiition code 4 or 5
     STACK_PUSH($ra, $s0, $s1, $s2)
 
     # Load song into $s2
@@ -281,17 +467,18 @@ FUNCTION_BEGIN Gameloop
     addi $s2, $s2, 4
 
     # Load random tiles into $s1
+    li   $a1, 4
     jal  CreateRandomTiles
     la   $s1, tiles
 
     # INPUT
     li   $s0, USER_INPUT
 
-    j    Gameloop.display
-Gameloop.input:
+    j    Gameloop4.display
+Gameloop4.input:
     # read user input
     lw   $t0, 0($s0)
-    beqz $t0, Gameloop.input
+    beqz $t0, Gameloop4.input
 
     # reset user input to zero
     sw   $zero, 0($s0)
@@ -301,7 +488,7 @@ Gameloop.input:
 
     # Test if user entered 1, 2, 3, or 4
     lw   $t1, 0($s1)
-    bne  $t0, $t1, Gameloop.failure
+    bne  $t0, $t1, Gameloop4.failure
 
     # Play note
     li   $v0, 31
@@ -319,21 +506,24 @@ Gameloop.input:
 
     # If tile is 0, then the song ended
     lw   $t0, 0($s1)
-    beqz $t0, Gameloop.success
+    beqz $t0, Gameloop4.success
 
     #
     # DISPLAY
     #
-Gameloop.display:
+Gameloop4.display:
     CLEAR_SCREEN(COR_SCREEN)
 
     # The logic to display the tiles in the correct column is:
     # (number of column - 1) * 8
     li   $a2, COR_TILE
+    
+    # Load the width of the rectangle
+    li   $a3, RECT_WIDTH_4T
 
     # Bottom row
     lw   $a0, 0($s1)
-    beqz $a0, Gameloop.input
+    beqz $a0, Gameloop4.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 48
@@ -341,7 +531,7 @@ Gameloop.display:
 
     # Middle-Bottom row
     lw   $a0, 4($s1)
-    beqz $a0, Gameloop.input
+    beqz $a0, Gameloop4.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 32
@@ -349,7 +539,7 @@ Gameloop.display:
 
     # Middle-Top row
     lw   $a0, 8($s1)
-    beqz $a0, Gameloop.input
+    beqz $a0, Gameloop4.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     li   $a1, 16
@@ -357,15 +547,15 @@ Gameloop.display:
 
     # Top row
     lw   $a0, 12($s1)
-    beqz $a0, Gameloop.input
+    beqz $a0, Gameloop4.input
     addi $a0, $a0, -1
     rol  $a0, $a0, 3
     move $a1, $zero
     jal  DrawRect
 
-    j    Gameloop.input
+    j    Gameloop4.input
 
-Gameloop.failure:
+Gameloop4.failure:
 
     CLEAR_SCREEN(COR_FAIL)
 
@@ -377,22 +567,153 @@ Gameloop.failure:
     li   $a3, 0x7F
     syscall
 
-    j    Gameloop.end
+    j    Gameloop4.end
 
-Gameloop.success:
+Gameloop4.success:
 
     CLEAR_SCREEN(COR_SUCCESS)
 
-Gameloop.end:
+Gameloop4.end:
+    STACK_POP($ra, $s0, $s1, $s2)
+FUNCTION_END
+
+
+
+# Funcao do gameloop para 4 colunas de tiles
+#
+# $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
+FUNCTION_BEGIN Gameloop8 #Posiition code 4 or 5
+    STACK_PUSH($ra, $s0, $s1, $s2)
+
+    # Load song into $s2
+    move $s2, $a0
+    # Skip size
+    addi $s2, $s2, 4
+
+    # Load random tiles into $s1
+    li   $a1, 8
+    jal  CreateRandomTiles
+    la   $s1, tiles
+
+    # INPUT
+    li   $s0, USER_INPUT
+
+    j    Gameloop8.display
+Gameloop8.input:
+    # read user input
+    lw   $t0, 0($s0)
+    beqz $t0, Gameloop8.input
+
+    # reset user input to zero
+    sw   $zero, 0($s0)
+
+    # subtract '0' to obtain true number
+    addi $t0, $t0, -48
+
+    # Test if user entered 1, 2, 3, or 4
+    lw   $t1, 0($s1)
+    bne  $t0, $t1, Gameloop8.failure
+
+    # Play note
+    li   $v0, 31
+    lw   $a0, 0($s2)
+    li   $a1, 1500
+    li   $a2, 0
+    li   $a3, 0x7F
+    syscall
+
+    # Go to next note
+    addi $s2, $s2, 4
+
+    # Go to next tile
+    addi $s1, $s1, 4
+
+    # If tile is 0, then the song ended
+    lw   $t0, 0($s1)
+    beqz $t0, Gameloop8.success
+
+    #
+    # DISPLAY
+    #
+Gameloop8.display:
+    CLEAR_SCREEN(COR_SCREEN)
+
+    # The logic to display the tiles in the correct column is:
+    # (number of column - 1) * 8
+    li   $a2, COR_TILE
+    
+    # Load the width of the rectangle
+    li   $a3, RECT_WIDTH_8T
+
+    # Bottom row
+    lw   $a0, 0($s1)
+    beqz $a0, Gameloop8.input
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 2
+    li   $a1, 48
+    jal  DrawRect
+
+    # Middle-Bottom row
+    lw   $a0, 4($s1)
+    beqz $a0, Gameloop8.input
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 2
+    li   $a1, 32
+    jal  DrawRect
+
+    # Middle-Top row
+    lw   $a0, 8($s1)
+    beqz $a0, Gameloop8.input
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 2
+    li   $a1, 16
+    jal  DrawRect
+
+    # Top row
+    lw   $a0, 12($s1)
+    beqz $a0, Gameloop8.input
+    addi $a0, $a0, -1
+    rol  $a0, $a0, 2
+    move $a1, $zero
+    jal  DrawRect
+
+    j    Gameloop8.input
+
+Gameloop8.failure:
+
+    CLEAR_SCREEN(COR_FAIL)
+
+    # Play failure note
+    li   $v0, 31
+    li   $a0, 15
+    li   $a1, 5000
+    li   $a2, 0
+    li   $a3, 0x7F
+    syscall
+
+    j    Gameloop8.end
+
+Gameloop8.success:
+
+    CLEAR_SCREEN(COR_SUCCESS)
+
+Gameloop8.end:
     STACK_POP($ra, $s0, $s1, $s2)
 FUNCTION_END
 
 
 # Funcao de criar tiles aleatorias
 # $a0: Endereco da musica
+# $a1: Quantidade de tiles para gerar (4 ou 8)
 FUNCTION_BEGIN CreateRandomTiles
-    STACK_PUSH($s0, $s1, $s2, $a0)
+    STACK_PUSH($s0, $s1, $s2, $s3, $a0)
 
+    # Save $a1
+    move $s3, $a1
+	
+    
+    	
+	
     # Get length of song
     lw   $s2, 0($a0)
 
@@ -402,13 +723,13 @@ FUNCTION_BEGIN CreateRandomTiles
 
     # Set the rgn seed with the current time
     li   $v0, 40
-    move $a1, $a0
     xor  $a0, $a0, $a0
+    move $a1, $a0
     syscall
 
     # Load upper range of the rgn
     li   $v0, 42
-    li   $a1, 4
+    move $a1, $s3
 
     la   $s0, tiles  # iterator
 
@@ -419,11 +740,11 @@ CreateRandomTiles.forloop:
     beq  $s0, $s1, CreateRandomTiles.endforloop
 
 CreateRandomTiles.retryunique:
-    # Get random number in interval [0, 3]
+    # Get random number in interval [0, $a1 - 1]
     xor  $a0, $a0, $a0
     syscall
 
-    # Add 1 to get [1, 4]
+    # Add 1 to get [1, $a1]
     addi $a0, $a0, 1
 
     # Ensure that the new tile isn't the same as the previous one
@@ -440,7 +761,7 @@ CreateRandomTiles.endforloop:
     # Add the 0 terminator to the stream of tiles
     sw   $zero, 0($s0)
 
-    STACK_POP($s0, $s1, $s2, $a0)
+    STACK_POP($s0, $s1, $s2, $s3, $a0)
 FUNCTION_END
 
 
@@ -466,9 +787,10 @@ FUNCTION_END
 # $a0: x
 # $a1: y
 # $a2: cor
+# $a3: largura do retangulo
 FUNCTION_BEGIN DrawRect
     STACK_PUSH($s0, $s1)
-    add  $s0, $a0, RECT_WIDTH  # Stop condition variable
+    add  $s0, $a0, $a3         # Stop condition variable
     add  $s1, $a1, RECT_HEIGHT # Stop condition variable
 DrawRect.forloop1:
 
@@ -495,16 +817,6 @@ DrawRect.endforloop1:
     STACK_POP($s0, $s1)
 FUNCTION_END
 
-
-
-FUNCTION_BEGIN DrawPixel
-    move $t8, $a1                # $t8 = y
-    rol  $t8, $t8, 5             # $t8 = y  * SCREEN_WIDTH
-    add  $t8, $t8, $a0           # $t8 = y  * SCREEN_WIDTH + x
-    rol  $t8, $t8, 2             # $t8 = (y * SCREEN_WIDTH + x) * 4
-    addi $t8, $t8, SCREEN_BEGIN  # $t8 = (y * SCREEN_WIDTH + x) * 4 + SCREEN_BEGIN
-    sw   $a2, ($t8)              # tela[y*w + x] = $a2
-FUNCTION_END
 
 
 # Funcao que copia um arquivo para a tela
