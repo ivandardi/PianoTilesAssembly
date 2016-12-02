@@ -179,31 +179,38 @@
 #
 
 .data
-
-    tela0_1: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_01.img"
-    tela0_2: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_02.img"
-    tela0_3: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_03.img"
-    tela1_1:
-    tela1_2:
-    tela1_3:
-    tela1_4:
-    tela1_5:
-    tela2_1:
-    tela2_2:
-    tela2_3:
-    tela2_4:
-    tela2_5:
-    tela3:
-    tela14:
-    tela15:
-    tela16:
-    tela17:
+    #tela0_1: .include "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_01.txt"
+    
+    tela0_2: .word 2, 0xFFFFFF, 0x000000
+    
+    tela0_3: .word 2, 0xFFFFFF, 0x000000
+    
+    #tela1_1
+    
+    tela1_2: .word 2, 0xFFFFFF, 0x000000
+    
+    tela1_3: .word 2, 0xFFFFFF, 0x000000
+    
+    tela1_4: .word 2, 0xFFFFFF, 0x000000
+    
+    tela1_5: .word 2, 0xFFFFFF, 0x000000
+    
+    tela3: .word 2, 0xFFFFFF, 0x000000
+    
+    tela14_1: .word 2, 0xFFFFFF, 0x000000
+    
+    tela14_2: .word 2, 0xFFFFFF, 0x000000
+    
+    #tela15_1
+    
+    tela15_2: .word 2, 0xFFFFFF, 0x000000
     
 
     ttls:  .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
     hbty:  .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
     swtim: .word 66, 69, 69, 69, 65, 72, 69, 65, 72, 69, 76, 76, 76, 77, 72, 68, 65, 72, 69, 81, 69, 69, 81, 80, 79, 78, 77, 78, 70, 75, 74, 73, 72, 71, 72, 65, 68, 66, 67, 72, 69, 72, 76, 81, 69, 69, 81, 80, 79, 78, 77, 78, 70, 75, 74, 73, 72, 71, 72, 65, 68, 66, 72, 69, 65, 72, 69
     mario: .word 203, 76, 76, 76, 72, 76, 79, 67, 72, 67, 64, 69, 71, 70, 69, 67, 76, 79, 81, 77, 79, 76, 72, 74, 71, 72, 67, 64, 69, 71, 70, 69, 67, 76, 79, 81, 77, 79, 76, 72, 74, 71, 79, 78, 76, 75, 76, 68, 69, 72, 69, 72, 74, 79, 78, 76, 75, 76, 72, 72, 84, 79, 78, 76, 75, 76, 68, 69, 72, 69, 72, 74, 75, 74, 72, 79, 78, 76, 75, 76, 68, 69, 72, 69, 72, 74, 79, 78, 76, 75, 76, 72, 72, 84, 79, 78, 76, 75, 76, 68, 69, 72, 69, 72, 74, 75, 74, 72, 72, 72, 72, 72, 74, 76, 72, 69, 67, 72, 72, 72, 72, 74, 76, 72, 72, 72, 72, 74, 76, 72, 69, 67, 76, 76, 76, 72, 76, 79, 67, 72, 67, 64, 69, 71, 70, 69, 67, 76, 79, 81, 77, 79, 76, 72, 74, 71, 72, 67, 64, 69, 71, 70, 69, 67, 76, 79, 81, 77, 79, 76, 72, 74, 71, 76, 72, 67, 68, 69, 77, 78, 71, 81, 81, 81, 79, 77, 76, 74, 69, 67, 76, 72, 67, 68, 69, 77, 78, 83, 77, 77, 77, 76, 74, 72
+    civv: .word 2, 60, 60
     tiles: .space 250
 
 .text
@@ -212,11 +219,8 @@
 
 main:
 
-#    jal MainLoop
+    jal MainLoop
 
-
-    la $a0, mario
-    jal Gameloop4
 
 
 DONE
@@ -246,54 +250,97 @@ MainLoop.loop:
     beq $v0, 11, MainLoop.loop.11 # music 3 - 8 tiles
     beq $v0, 12, MainLoop.loop.12 # music 4 - 8 tiles
     beq $v0, 13, MainLoop.loop.13 # music 5 - 8 tiles
-    beq $v0, 14, MainLoop.loop.14 # success - 4 tiles
-    beq $v0, 15, MainLoop.loop.15 # success - 8 tiles
-    beq $v0, 16, MainLoop.loop.16 # fail - 4 tiles
-    beq $v0, 17, MainLoop.loop.17 # fail - 8 tiles
+    beq $v0, 14, MainLoop.loop.14 # success 
+    beq $v0, 15, MainLoop.loop.15 # fail
 
 
 MainLoop.loop.0:
+
     jal MainScreen
     j MainLoop.loop
+    
 MainLoop.loop.1:
+
     jal SelectionScreen4
     j MainLoop.loop
 MainLoop.loop.2:
+
     jal SelectionScreen8
     j MainLoop.loop
+    
 MainLoop.loop.3:
+
     jal InfoScreen
     j MainLoop.loop
+    
 MainLoop.loop.4:
+
+    la $a0, hbty
+    jal Gameloop4
     j MainLoop.loop
+    
 MainLoop.loop.5:
+
+    la $a0, ttls
+    jal Gameloop4
     j MainLoop.loop
+    
 MainLoop.loop.6:
+
+    la $a0, civv
+    jal Gameloop4
     j MainLoop.loop
+    
 MainLoop.loop.7:
+
+    la $a0, swtim
+    jal Gameloop4
     j MainLoop.loop
+    
 MainLoop.loop.8:
+
+    la $a0, mario
+    jal Gameloop4
     j MainLoop.loop
+    
 MainLoop.loop.9:
+
+    la $a0, hbty
+    jal Gameloop8
     j MainLoop.loop
+    
 MainLoop.loop.10:
+
+    la $a0, ttls
+    jal Gameloop8
     j MainLoop.loop
+    
 MainLoop.loop.11:
+
+    la $a0, civv
+    jal Gameloop8
     j MainLoop.loop
+    
 MainLoop.loop.12:
+
+    la $a0, swtim
+    jal Gameloop8
     j MainLoop.loop
+    
 MainLoop.loop.13:
+
+    la $a0, mario
+    jal Gameloop8
     j MainLoop.loop
+    
 MainLoop.loop.14:
+    
+    jal SuccessScreen
     j MainLoop.loop
+    
 MainLoop.loop.15:
-
-    j MainLoop.loop
-MainLoop.loop.16:
-    j MainLoop.loop
-MainLoop.loop.17:
-
-
+    
+    jal FailScreen
     j MainLoop.loop
 
 MainLoop.end:
@@ -427,7 +474,7 @@ FUNCTION_END
 FUNCTION_BEGIN SelectionScreen4 #Position Code: 1 or 2, paratemer
     STACK_PUSH($ra, $s0, $s1, $s2)
 
-    SCREEN_IMAGE(tela2)
+    SCREEN_IMAGE(tela1_1)
 
     # INPUT
     li $s0, USER_INPUT
@@ -488,26 +535,31 @@ SelectionScreen4.screen:
 SelectionScreen4.tela4:
 
     SCREEN_IMAGE(tela1_1)
+    li $v1, 4
     j SelectionScreen4.input
 
 SelectionScreen4.tela5:
 
     SCREEN_IMAGE(tela1_2)
+    li $v1, 5
     j SelectionScreen4.input
 
 SelectionScreen4.tela6:
 
     SCREEN_IMAGE(tela1_3)
+    li $v1, 6
     j SelectionScreen4.input
 
 SelectionScreen4.tela7:
 
     SCREEN_IMAGE(tela1_4)
+    li $v1, 7
     j SelectionScreen4.input
 
 SelectionScreen4.tela8:
 
     SCREEN_IMAGE(tela1_5)
+    li $v1, 8
     j SelectionScreen4.input
 
 
@@ -526,7 +578,7 @@ FUNCTION_END
 FUNCTION_BEGIN SelectionScreen8
     STACK_PUSH($ra, $s0, $s1, $s2)
 
-    SCREEN_IMAGE(tela2)
+    SCREEN_IMAGE(tela1_1)
 
     # INPUT
     li $s0, USER_INPUT
@@ -578,35 +630,40 @@ SelectionScreen8.s:
 
 SelectionScreen8.screen:
 
-    beq $s1, 9, SelectionScreen9.tela9
-    beq $s1, 10, SelectionScreen10.tela10
-    beq $s1, 11, SelectionScreen11.tela11
-    beq $s1, 12, SelectionScreen12.tela12
-    beq $s1, 13, SelectionScreen13.tela13
+    beq $s1, 9, SelectionScreen8.tela9
+    beq $s1, 10, SelectionScreen8.tela10
+    beq $s1, 11, SelectionScreen8.tela11
+    beq $s1, 12, SelectionScreen8.tela12
+    beq $s1, 13, SelectionScreen8.tela13
 
 SelectionScreen8.tela9:
 
-    SCREEN_IMAGE(tela2_1)
+    SCREEN_IMAGE(tela1_1)
+    li $v1, 9
     j SelectionScreen8.input
 
 SelectionScreen8.tela10:
 
-    SCREEN_IMAGE(tela2_2)
+    SCREEN_IMAGE(tela1_2)
+    li $v1, 10
     j SelectionScreen8.input
 
 SelectionScreen8.tela11:
 
-    SCREEN_IMAGE(tela2_3)
+    SCREEN_IMAGE(tela1_3)
+    li $v1, 11
     j SelectionScreen8.input
 
 SelectionScreen8.tela12:
 
-    SCREEN_IMAGE(tela2_4)
+    SCREEN_IMAGE(tela1_4)
+    li $v1, 12
     j SelectionScreen8.input
 
 SelectionScreen8.tela13:
 
-    SCREEN_IMAGE(tela2_4)
+    SCREEN_IMAGE(tela1_5)
+    li $v1, 13
     j SelectionScreen8.input
 
 SelectionScreen8.back:
@@ -621,11 +678,178 @@ FUNCTION_END
 
 
 
+FUNCTION_BEGIN SuccessScreen #Position Code: 0
+    STACK_PUSH($ra, $s0, $s1, $s2, $v1)
+
+    SCREEN_IMAGE(tela14_1)
+
+    # INPUT
+    li $s0, USER_INPUT
+
+    li $s1, 1  # Set $s1 to 1. $s1 is the position
+
+SuccessScreen.input:
+    # read user input
+    lw   $s2, 0($s0)
+    beqz $s2, SuccessScreen.input
+
+    # reset user input to zero
+    sw   $zero, 0($s0)
+
+    # $s2 has the user input
+
+    # Check to see if the user pressed w or W
+    beq $s2, 119, SuccessScreen.w
+    beq $s2, 87, SuccessScreen.w
+
+    # Check to see if the user pressed s or S
+    beq $s2, 115, SuccessScreen.s
+    beq $s2, 83, SuccessScreen.s
+
+    # Check to see if the user pressed enter
+    beq $s2, 10, SuccessScreen.enter
+
+    j SuccessScreen.input
+
+SuccessScreen.w:
+
+    beq  $s1, 1, SuccessScreen.input
+    addi $s1, $s1, -1
+
+    j SuccessScreen.screen
+
+SuccessScreen.s:
+
+    beq  $s1, 2, SuccessScreen.input
+    addi $s1, $s1, 1
+
+    j SuccessScreen.screen
+
+SuccessScreen.screen:
+
+    beq $s1, 1, SuccessScreen.tela14
+    beq $s1, 2, SuccessScreen.tela15
+
+SuccessScreen.tela14:
+
+    SCREEN_IMAGE(tela14_1)
+    j SuccessScreen.input
+
+SuccessScreen.tela15:
+
+    SCREEN_IMAGE(tela14_2)
+    j SuccessScreen.input
+
+SuccessScreen.enter:
+
+    beq $s1, 2, SuccessScreen.end1
+    
+    STACK_POP($v1)
+    
+move $v0, $v1
+    j SuccessScreen.end2
+    
+SuccessScreen.end1:
+    li $v0, 0
+SuccessScreen.end2:
+    STACK_POP($ra, $s0, $s1, $s2)
+FUNCTION_END
+
+
+
+FUNCTION_BEGIN FailScreen #Position Code: 0
+    STACK_PUSH($ra, $s0, $s1, $s2, $v1)
+
+    SCREEN_IMAGE(tela15_1)
+    
+    # Play failure note
+    li   $v0, 31
+    li   $a0, 15
+    li   $a1, 5000
+    li   $a2, 0
+    li   $a3, 0x7F
+    syscall
+
+    # INPUT
+    li $s0, USER_INPUT
+
+    li $s1, 1  # Set $s1 to 1. $s1 is the position
+
+FailScreen.input:
+    # read user input
+    lw   $s2, 0($s0)
+    beqz $s2, FailScreen.input
+
+    # reset user input to zero
+    sw   $zero, 0($s0)
+
+    # $s2 has the user input
+
+    # Check to see if the user pressed w or W
+    beq $s2, 119, FailScreen.w
+    beq $s2, 87, FailScreen.w
+
+    # Check to see if the user pressed s or S
+    beq $s2, 115, FailScreen.s
+    beq $s2, 83, FailScreen.s
+
+    # Check to see if the user pressed enter
+    beq $s2, 10, FailScreen.enter
+
+    j FailScreen.input
+
+FailScreen.w:
+
+    beq  $s1, 1, FailScreen.input
+    addi $s1, $s1, -1
+
+    j FailScreen.screen
+
+FailScreen.s:
+
+    beq  $s1, 2, FailScreen.input
+    addi $s1, $s1, 1
+
+    j FailScreen.screen
+
+FailScreen.screen:
+
+    beq $s1, 1, FailScreen.tela16
+    beq $s1, 2, FailScreen.tela17
+
+FailScreen.tela16:
+
+    SCREEN_IMAGE(tela15_1)
+    j FailScreen.input
+
+FailScreen.tela17:
+
+    SCREEN_IMAGE(tela15_2)
+    j FailScreen.input
+
+FailScreen.enter:
+
+    beq $s1, 2, FailScreen.end1
+    
+    STACK_POP($v1)
+    
+    move $v0, $v1
+    j FailScreen.end2
+    
+FailScreen.end1:
+    li $v0, 0
+FailScreen.end2:
+
+    STACK_POP($ra, $s0, $s1, $s2)
+FUNCTION_END
+
+
+
 # Funcao do gameloop para 4 colunas de tiles
 #
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
-FUNCTION_BEGIN Gameloop4 #Posiition code 4 or 5
-    STACK_PUSH($ra, $s0, $s1, $s2)
+FUNCTION_BEGIN Gameloop4 #Position code 4
+    STACK_PUSH($ra, $s0, $s1, $s2, $v1)
 
     # Load song into $s2
     move $s2, $a0
@@ -723,24 +947,16 @@ Gameloop4.display:
 
 Gameloop4.failure:
 
-    CLEAR_SCREEN(COR_FAIL)
-
-    # Play failure note
-    li   $v0, 31
-    li   $a0, 15
-    li   $a1, 5000
-    li   $a2, 0
-    li   $a3, 0x7F
-    syscall
+    li $v0, 15
 
     j    Gameloop4.end
 
 Gameloop4.success:
 
-    CLEAR_SCREEN(COR_SUCCESS)
+    li $v0, 14
 
 Gameloop4.end:
-    STACK_POP($ra, $s0, $s1, $s2)
+    STACK_POP($ra, $s0, $s1, $s2, $v1)
 FUNCTION_END
 
 
@@ -749,7 +965,7 @@ FUNCTION_END
 #
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
 FUNCTION_BEGIN Gameloop8 #Posiition code 4 or 5
-    STACK_PUSH($ra, $s0, $s1, $s2)
+    STACK_PUSH($ra, $s0, $s1, $s2, $v1)
 
     # Load song into $s2
     move $s2, $a0
@@ -847,24 +1063,16 @@ Gameloop8.display:
 
 Gameloop8.failure:
 
-    CLEAR_SCREEN(COR_FAIL)
-
-    # Play failure note
-    li   $v0, 31
-    li   $a0, 15
-    li   $a1, 5000
-    li   $a2, 0
-    li   $a3, 0x7F
-    syscall
+    li $v0, 15
 
     j    Gameloop8.end
 
 Gameloop8.success:
 
-    CLEAR_SCREEN(COR_SUCCESS)
+    li $v0, 14
 
 Gameloop8.end:
-    STACK_POP($ra, $s0, $s1, $s2)
+    STACK_POP($ra, $s0, $s1, $s2, $v1)
 FUNCTION_END
 
 
@@ -876,8 +1084,6 @@ FUNCTION_BEGIN CreateRandomTiles
 
     # Save $a1
     move $s3, $a1
-
-
 
 
     # Get length of song
