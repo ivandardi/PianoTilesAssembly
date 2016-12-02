@@ -19,7 +19,7 @@
 
     # Largura do retangulo do piano
     .eqv RECT_WIDTH_8T 4
-    
+
     # Altura do retangulo do piano
     .eqv RECT_HEIGHT 16
 
@@ -87,20 +87,20 @@
         li  $a2, %cor
         jal DrawRect
     .end_macro
-    
+
     # Macro que faz o programa esperar por %ms milissegundos
     .macro SLEEP(%ms)
         li $v0, 32
         li $a0, %ms
         syscall
     .end_macro
-        
+
     # Macro pra desenhar na tela
     .macro SCREEN_IMAGE(%arq)
         la $a0, %arq
         jal ScreenImage
     .end_macro
-        
+
     # Macros que facilitam salvar na pilha. Os registradores sao salvos em ordem
     .macro STACK_PUSH(%a)
         addi $sp, $sp, -4
@@ -127,7 +127,7 @@
         sw   %c, 8($sp)
         sw   %d, 12($sp)
     .end_macro
-    
+
     .macro STACK_PUSH(%a, %b, %c, %d, %e)
         addi $sp, $sp, -20
         sw   %a, 0($sp)
@@ -196,18 +196,18 @@ main:
 
     jal MainLoop
 
-          
+
 DONE
 
 
 
 FUNCTION_BEGIN MainLoop #Control Setup and Game flow
     STACK_PUSH($ra)
-    
+
     jal MainScreen
-    
+
 MainLoop.loop:
-   
+
     # If $v0 is 1, then play with 4 columns of tiles
     beq $v0, 0, MainLoop.loop.0 # initial
     beq $v0, 1, MainLoop.loop.1 # select music 4 tiles
@@ -230,10 +230,10 @@ MainLoop.loop:
 
 MainLoop.loop.1:
 
-    
+
 
     #j MainLoop.loop
-	
+
 MainLoop.end:
 
     STACK_POP($ra)
@@ -243,57 +243,57 @@ FUNCTION_END
 
 FUNCTION_BEGIN MainScreen #Position Code: 0
     STACK_PUSH($ra, $s0, $s1, $s2)
-    
+
     SCREEN_IMAGE(tela1)
-    
+
     # INPUT
     li $s0, USER_INPUT
-    
+
     li $s1, 1  # Set $s1 to 1. $s1 is the position
-    
+
 MainScreen.input:
     # read user input
     lw   $s2, 0($s0)
     beqz $s2, MainScreen.input
-    
+
     # reset user input to zero
     sw   $zero, 0($s0)
-    
+
     # $s2 has the user input
-    
+
     # Check to see if the user pressed w or W
     beq $s2, 119, MainScreen.w
     beq $s2, 87, MainScreen.w
-    
+
     # Check to see if the user pressed s or S
     beq $s2, 115, MainScreen.s
     beq $s2, 83, MainScreen.s
-    
+
     # Check to see if the user pressed enter
     beq $s2, 10, MainScreen.enter
-    
+
     j MainScreen.input
-	
+
 MainScreen.w:
 
     beq  $s1, 1, MainScreen.input
     addi $s1, $s1, -1
-    
+
     j MainScreen.screen
 
-MainScreen.s:    
+MainScreen.s:
 
     beq  $s1, 3, MainScreen.input
     addi $s1, $s1, 1
-    
-    j MainScreen.screen    
-    
+
+    j MainScreen.screen
+
 MainScreen.screen:
-    
+
     beq $s1, 1, MainScreen.tela1
     beq $s1, 2, MainScreen.tela2
     beq $s1, 3, MainScreen.tela3
-    
+
 MainScreen.tela1:
 
     SCREEN_IMAGE(tela1)
@@ -305,10 +305,10 @@ MainScreen.tela2:
     j MainScreen.input
 
 MainScreen.tela3:
-    
+
     SCREEN_IMAGE(tela3)
     j MainScreen.input
-    
+
 MainScreen.enter:
 
     move $v0, $s1
@@ -320,31 +320,31 @@ FUNCTION_END
 
 FUNCTION_BEGIN InfoScreen #Position Code: 3
     STACK_PUSH($ra, $s0, $s2)
-    
+
     SCREEN_IMAGE(tela2)
-    
+
     # INPUT
     li $s0, USER_INPUT
-        
+
 InfoScreen.input:
     # read user input
     lw   $s2, 0($s0)
     beqz $s2, InfoScreen.input
-    
+
     # reset user input to zero
     sw   $zero, 0($s0)
-    
+
     # $s2 has the user input
-    
+
     # Check to see if the user pressed ESC
     beq $s2, 27, InfoScreen.back
-    
+
     # Check to see if the user pressed BackSpace
     beq $s2, 8, InfoScreen.back
-    
+
 
     j InfoScreen.input
-	
+
 InfoScreen.back:
 
     li $v0, 1
@@ -356,65 +356,65 @@ FUNCTION_END
 
 FUNCTION_BEGIN SelectionScreen #Position Code: 1 or 2, paratemer
     STACK_PUSH($ra, $s0, $s1, $s2)
-    
+
     SCREEN_IMAGE(tela2)
-    
+
     # INPUT
     li $s0, USER_INPUT
-    
+
     li $s1, 4  # Set $s1 to 4. $s1 is the position
-    
+
 SelectionScreen.input:
     # read user input
     lw   $s2, 0($s0)
     beqz $s2, SelectionScreen.input
-    
+
     # reset user input to zero
     sw   $zero, 0($s0)
-    
+
     # $s2 has the user input
-    
+
     # Check to see if the user pressed ESC
     beq $s2, 27, SelectionScreen.back
-    
+
     # Check to see if the user pressed BackSpace
     beq $s2, 8, SelectionScreen.back
-    
+
     # Check to see if the user pressed w or W
     beq $s2, 119, SelectionScreen.w
     beq $s2, 87, SelectionScreen.w
-    
+
     # Check to see if the user pressed s or S
     beq $s2, 115, SelectionScreen.s
     beq $s2, 83, SelectionScreen.s
-    
+
     # Check to see if the user pressed enter
     beq $s2, 10, SelectionScreen.enter
-    
+
     j SelectionScreen.input
-    
+
 SelectionScreen.w:
 
     beq  $s1, 4, SelectionScreen.input
     addi $s1, $s1, -1
-    
+
     j MainScreen.screen
 
-SelectionScreen.s:    
+SelectionScreen.s:
 
     beq  $s1, 8, SelectionScreen.input
     addi $s1, $s1, 1
-    
-    j MainScreen.screen    
-    
+
+    j MainScreen.screen
+
 SelectionScreen.screen:
-    
+
     beq $s1, 4, SelectionScreen.tela4
     beq $s1, 5, SelectionScreen.tela5
     beq $s1, 6, SelectionScreen.tela6
     beq $s1, 7, SelectionScreen.tela7
     beq $s1, 8, SelectionScreen.tela8
-    
+
 SelectionScreen.tela4:
 
     SCREEN_IMAGE(tela1)
@@ -426,10 +426,10 @@ SelectionScreen.tela5:
     j SelectionScreen.input
 
 SelectionScreen.tela6:
-    
+
     SCREEN_IMAGE(tela3)
     j SelectionScreen.input
-    
+
 SelectionScreen.tela7:
 
     SCREEN_IMAGE(tela1)
@@ -438,15 +438,15 @@ SelectionScreen.tela7:
 SelectionScreen.tela8:
 
     SCREEN_IMAGE(tela2)
-    j SelectionScreen.input   
+    j SelectionScreen.input
 
-	
-				
+
+
 SelectionScreen.back:
     li $s1, 0
     j SelectionScreen.end
 SelectionScreen.enter:
-    
+
 SelectionScreen.end:
     move $v0, $s1
 
@@ -517,7 +517,7 @@ Gameloop4.display:
     # The logic to display the tiles in the correct column is:
     # (number of column - 1) * 8
     li   $a2, COR_TILE
-    
+
     # Load the width of the rectangle
     li   $a3, RECT_WIDTH_4T
 
@@ -641,7 +641,7 @@ Gameloop8.display:
     # The logic to display the tiles in the correct column is:
     # (number of column - 1) * 8
     li   $a2, COR_TILE
-    
+
     # Load the width of the rectangle
     li   $a3, RECT_WIDTH_8T
 
@@ -710,10 +710,10 @@ FUNCTION_BEGIN CreateRandomTiles
 
     # Save $a1
     move $s3, $a1
-	
-    
-    	
-	
+
+
+
+
     # Get length of song
     lw   $s2, 0($a0)
 
