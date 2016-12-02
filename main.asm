@@ -395,31 +395,19 @@ FUNCTION_END
 
 
 
-# Funcao que copia um arquivo para a tela
-# $a0: string terminada em nulo com o nome do arquivo
+# Funcao que imprime uma tela
+# $a0: endereco de memoria com o vetor de tela
 FUNCTION_BEGIN ScreenImage
-    STACK_PUSH($s0)
-
-    # Open file ($a0 already has the filename)
-    li   $v0, 13       # Open file code
-    xor  $a1, $a1, $a1 # Open for reading (flags are 0: read, 1: write)
-    xor  $a2, $a2, $a2 # Mode is ignored
-    syscall
-
-    # Move file to $s0
-    move $s0, $v0
-
-    # Copy from file to screen
-    li   $v0, 14           # Read file code
-    move $a0, $s0
-    la   $a1, SCREEN_BEGIN # Address of screen
-    li   $a2, 8192         # Amount of characters to read
-    syscall
-
-    # Close the file
-    li   $v0, 16  # Close file code
-    move $a0, $s0 # File to be closed
-    syscall
-
-    STACK_POP($s0)
+    STACK_PUSH($s0, $s1)
+    li    $s0, SCREEN_BEGIN # iterator
+    li    $s1, SCREEN_END   # end value of the for loop
+ClearScreen.forloop:
+    beq   $s0, $s1, ClearScreen.endforloop
+    lw    $t0, 0($a0)
+    sw    $t0, 0($s0)       # Set $s0 to the color stored in $a0
+    addi  $s0, $s0, 4       # Increment %s0 by 4
+    addi  $a0, $a0, 4
+    j     ClearScreen.forloop
+ClearScreen.endforloop:
+    STACK_POP($s0, $s1)
 FUNCTION_END
