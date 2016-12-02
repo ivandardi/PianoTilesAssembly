@@ -180,9 +180,25 @@
 
 .data
 
-    tela1: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_01.img"
-    tela2: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_02.img"
-    tela3: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_03.img"
+    tela0_1: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_01.img"
+    tela0_2: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_02.img"
+    tela0_3: .asciiz "/home-local/aluno/PianoTilesAssembly/img/tela_inicial_03.img"
+    tela1_1:
+    tela1_2:
+    tela1_3:
+    tela1_4:
+    tela1_5:
+    tela2_1:
+    tela2_2:
+    tela2_3:
+    tela2_4:
+    tela2_5:
+    tela3:
+    tela14:
+    tela15:
+    tela16:
+    tela17:
+    
 
     ttls:  .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
     hbty:  .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
@@ -213,31 +229,71 @@ FUNCTION_BEGIN MainLoop #Control Setup and Game flow
 
 MainLoop.loop:
 
-    # If $v0 is 1, then play with 4 columns of tiles
-#    beq $v0, 0, MainLoop.loop.0 # initial
-#    beq $v0, 1, MainLoop.loop.1 # select music 4 tiles
-#    beq $v0, 2, MainLoop.loop.2 # select music 8 tiles
-#    beq $v0, 3, MainLoop.loop.3 # information
-#    beq $v0, 4, MainLoop.loop.4 # music 1 - 4 tiles
-#    beq $v0, 5, MainLoop.loop.5 # music 2 - 4 tiles
-#    beq $v0, 6, MainLoop.loop.6 # music 3 - 4 tiles
-#    beq $v0, 7, MainLoop.loop.7 # music 4 - 4 tiles
-#    beq $v0, 8, MainLoop.loop.8 # music 5 - 4 tiles
-#    beq $v0, 9, MainLoop.loop.9 # music 1 - 8 tiles
-#    beq $v0, 10, MainLoop.loop.10 # music 2 - 8 tiles
-#    beq $v0, 11, MainLoop.loop.11 # music 3 - 8 tiles
-#    beq $v0, 12, MainLoop.loop.12 # music 4 - 8 tiles
-#    beq $v0, 13, MainLoop.loop.13 # music 5 - 8 tiles
-#    beq $v0, 14, MainLoop.loop.14 # success - 4 tiles
-#    beq $v0, 15, MainLoop.loop.15 # success - 8 tiles
-#    beq $v0, 16, MainLoop.loop.16 # fail - 4 tiles
-#    beq $v0, 17, MainLoop.loop.17 # fail - 8 tiles
+     # If $v0 is 1, then play with 4 columns of tiles
+    beq $v0, -1, MainLoop.end # fail - 8 tiles
+    beq $v0, 0, MainLoop.loop.0 # initial
+    beq $v0, 1, MainLoop.loop.1 # select music 4 tiles
+    beq $v0, 2, MainLoop.loop.2 # select music 8 tiles
+    beq $v0, 3, MainLoop.loop.3 # information
+    beq $v0, 4, MainLoop.loop.4 # music 1 - 4 tiles
+    beq $v0, 5, MainLoop.loop.5 # music 2 - 4 tiles
+    beq $v0, 6, MainLoop.loop.6 # music 3 - 4 tiles
+    beq $v0, 7, MainLoop.loop.7 # music 4 - 4 tiles
+    beq $v0, 8, MainLoop.loop.8 # music 5 - 4 tiles
+    beq $v0, 9, MainLoop.loop.9 # music 1 - 8 tiles
+    beq $v0, 10, MainLoop.loop.10 # music 2 - 8 tiles
+    beq $v0, 11, MainLoop.loop.11 # music 3 - 8 tiles
+    beq $v0, 12, MainLoop.loop.12 # music 4 - 8 tiles
+    beq $v0, 13, MainLoop.loop.13 # music 5 - 8 tiles
+    beq $v0, 14, MainLoop.loop.14 # success - 4 tiles
+    beq $v0, 15, MainLoop.loop.15 # success - 8 tiles
+    beq $v0, 16, MainLoop.loop.16 # fail - 4 tiles
+    beq $v0, 17, MainLoop.loop.17 # fail - 8 tiles
 
+
+MainLoop.loop.0:
+    jal MainScreen
+    j MainLoop.loop
 MainLoop.loop.1:
+    jal SelectionScreen4
+    j MainLoop.loop
+MainLoop.loop.2:
+    jal SelectionScreen8
+    j MainLoop.loop
+MainLoop.loop.3:
+    jal InfoScreen
+    j MainLoop.loop
+MainLoop.loop.4:
+    j MainLoop.loop
+MainLoop.loop.5:
+    j MainLoop.loop
+MainLoop.loop.6:
+    j MainLoop.loop
+MainLoop.loop.7:
+    j MainLoop.loop
+MainLoop.loop.8:
+    j MainLoop.loop
+MainLoop.loop.9:
+    j MainLoop.loop
+MainLoop.loop.10:
+    j MainLoop.loop
+MainLoop.loop.11:
+    j MainLoop.loop
+MainLoop.loop.12:
+    j MainLoop.loop
+MainLoop.loop.13:
+    j MainLoop.loop
+MainLoop.loop.14:
+    j MainLoop.loop
+MainLoop.loop.15:
+
+    j MainLoop.loop
+MainLoop.loop.16:
+    j MainLoop.loop
+MainLoop.loop.17:
 
 
-
-    #j MainLoop.loop
+    j MainLoop.loop
 
 MainLoop.end:
 
@@ -249,7 +305,7 @@ FUNCTION_END
 FUNCTION_BEGIN MainScreen #Position Code: 0
     STACK_PUSH($ra, $s0, $s1, $s2)
 
-    SCREEN_IMAGE(tela1)
+    SCREEN_IMAGE(tela0_1)
 
     # INPUT
     li $s0, USER_INPUT
@@ -276,6 +332,12 @@ MainScreen.input:
 
     # Check to see if the user pressed enter
     beq $s2, 10, MainScreen.enter
+    
+    # Check to see if the user pressed ESC
+    beq $s2, 27, MainScreen.end
+
+    # Check to see if the user pressed BackSpace
+    beq $s2, 8, MainScreen.end
 
     j MainScreen.input
 
@@ -301,19 +363,21 @@ MainScreen.screen:
 
 MainScreen.tela1:
 
-    SCREEN_IMAGE(tela1)
+    SCREEN_IMAGE(tela0_1)
     j MainScreen.input
 
 MainScreen.tela2:
 
-    SCREEN_IMAGE(tela2)
+    SCREEN_IMAGE(tela0_2)
     j MainScreen.input
 
 MainScreen.tela3:
 
-    SCREEN_IMAGE(tela3)
+    SCREEN_IMAGE(tela0_3)
     j MainScreen.input
 
+MainScreen.end:
+    li $s1, -1
 MainScreen.enter:
 
     move $v0, $s1
@@ -326,7 +390,7 @@ FUNCTION_END
 FUNCTION_BEGIN InfoScreen #Position Code: 3
     STACK_PUSH($ra, $s0, $s2)
 
-    SCREEN_IMAGE(tela2)
+    SCREEN_IMAGE(tela3)
 
     # INPUT
     li $s0, USER_INPUT
@@ -352,14 +416,14 @@ InfoScreen.input:
 
 InfoScreen.back:
 
-    li $v0, 1
+    li $v0, 0
 
     STACK_POP($ra, $s0, $s2)
 FUNCTION_END
 
 
 
-FUNCTION_BEGIN SelectionScreen #Position Code: 1 or 2, paratemer
+FUNCTION_BEGIN SelectionScreen4 #Position Code: 1 or 2, paratemer
     STACK_PUSH($ra, $s0, $s1, $s2)
 
     SCREEN_IMAGE(tela2)
@@ -369,10 +433,10 @@ FUNCTION_BEGIN SelectionScreen #Position Code: 1 or 2, paratemer
 
     li $s1, 4  # Set $s1 to 4. $s1 is the position
 
-SelectionScreen.input:
+SelectionScreen4.input:
     # read user input
     lw   $s2, 0($s0)
-    beqz $s2, SelectionScreen.input
+    beqz $s2, SelectionScreen4.input
 
     # reset user input to zero
     sw   $zero, 0($s0)
@@ -380,79 +444,175 @@ SelectionScreen.input:
     # $s2 has the user input
 
     # Check to see if the user pressed ESC
-    beq $s2, 27, SelectionScreen.back
+    beq $s2, 27, SelectionScreen4.back
 
     # Check to see if the user pressed BackSpace
-    beq $s2, 8, SelectionScreen.back
+    beq $s2, 8, SelectionScreen4.back
 
     # Check to see if the user pressed w or W
-    beq $s2, 119, SelectionScreen.w
-    beq $s2, 87, SelectionScreen.w
+    beq $s2, 119, SelectionScreen4.w
+    beq $s2, 87, SelectionScreen4.w
 
     # Check to see if the user pressed s or S
-    beq $s2, 115, SelectionScreen.s
-    beq $s2, 83, SelectionScreen.s
+    beq $s2, 115, SelectionScreen4.s
+    beq $s2, 83, SelectionScreen4.s
 
     # Check to see if the user pressed enter
-    beq $s2, 10, SelectionScreen.enter
+    beq $s2, 10, SelectionScreen4.end
 
-    j SelectionScreen.input
+    j SelectionScreen4.input
 
-SelectionScreen.w:
+SelectionScreen4.w:
 
-    beq  $s1, 4, SelectionScreen.input
+    beq  $s1, 4, SelectionScreen4.input
     addi $s1, $s1, -1
 
-    j MainScreen.screen
+    j SelectionScreen4.screen
 
-SelectionScreen.s:
+SelectionScreen4.s:
 
-    beq  $s1, 8, SelectionScreen.input
+    beq  $s1, 8, SelectionScreen4.input
     addi $s1, $s1, 1
 
-    j MainScreen.screen
+    j SelectionScreen4.screen
 
-SelectionScreen.screen:
+SelectionScreen4.screen:
 
-    beq $s1, 4, SelectionScreen.tela4
-    beq $s1, 5, SelectionScreen.tela5
-    beq $s1, 6, SelectionScreen.tela6
-    beq $s1, 7, SelectionScreen.tela7
-    beq $s1, 8, SelectionScreen.tela8
+    beq $s1, 4, SelectionScreen4.tela4
+    beq $s1, 5, SelectionScreen4.tela5
+    beq $s1, 6, SelectionScreen4.tela6
+    beq $s1, 7, SelectionScreen4.tela7
+    beq $s1, 8, SelectionScreen4.tela8
 
-SelectionScreen.tela4:
+SelectionScreen4.tela4:
 
-    SCREEN_IMAGE(tela1)
-    j SelectionScreen.input
+    SCREEN_IMAGE(tela1_1)
+    j SelectionScreen4.input
 
-SelectionScreen.tela5:
+SelectionScreen4.tela5:
 
-    SCREEN_IMAGE(tela2)
-    j SelectionScreen.input
+    SCREEN_IMAGE(tela1_2)
+    j SelectionScreen4.input
 
-SelectionScreen.tela6:
+SelectionScreen4.tela6:
 
-    SCREEN_IMAGE(tela3)
-    j SelectionScreen.input
+    SCREEN_IMAGE(tela1_3)
+    j SelectionScreen4.input
 
-SelectionScreen.tela7:
+SelectionScreen4.tela7:
 
-    SCREEN_IMAGE(tela1)
-    j SelectionScreen.input
+    SCREEN_IMAGE(tela1_4)
+    j SelectionScreen4.input
 
-SelectionScreen.tela8:
+SelectionScreen4.tela8:
 
-    SCREEN_IMAGE(tela2)
-    j SelectionScreen.input
+    SCREEN_IMAGE(tela1_5)
+    j SelectionScreen4.input
 
 
+SelectionScreen4.back:
 
-SelectionScreen.back:
     li $s1, 0
-    j SelectionScreen.end
-SelectionScreen.enter:
 
-SelectionScreen.end:
+SelectionScreen4.end:
+    move $v0, $s1
+
+    STACK_POP($ra, $s0, $s1, $s2)
+FUNCTION_END
+
+
+    # Selection for 8bits
+FUNCTION_BEGIN SelectionScreen8
+    STACK_PUSH($ra, $s0, $s1, $s2)
+
+    SCREEN_IMAGE(tela2)
+
+    # INPUT
+    li $s0, USER_INPUT
+
+    li $s1, 9  # Set $s1 to 4. $s1 is the position
+
+SelectionScreen8.input:
+    # read user input
+    lw   $s2, 0($s0)
+    beqz $s2, SelectionScreen8.input
+
+    # reset user input to zero
+    sw   $zero, 0($s0)
+
+    # $s2 has the user input
+
+    # Check to see if the user pressed ESC
+    beq $s2, 27, SelectionScreen8.back
+
+    # Check to see if the user pressed BackSpace
+    beq $s2, 8, SelectionScreen8.back
+
+    # Check to see if the user pressed w or W
+    beq $s2, 119, SelectionScreen8.w
+    beq $s2, 87, SelectionScreen8.w
+
+    # Check to see if the user pressed s or S
+    beq $s2, 115, SelectionScreen8.s
+    beq $s2, 83, SelectionScreen8.s
+
+    # Check to see if the user pressed enter
+    beq $s2, 10, SelectionScreen8.end
+
+    j SelectionScreen8.input
+
+SelectionScreen8.w:
+
+    beq  $s1, 9, SelectionScreen8.input
+    addi $s1, $s1, -1
+
+    j SelectionScreen8.screen
+
+SelectionScreen8.s:
+
+    beq  $s1, 13, SelectionScreen8.input
+    addi $s1, $s1, 1
+
+    j SelectionScreen8.screen
+
+SelectionScreen8.screen:
+
+    beq $s1, 9, SelectionScreen9.tela9
+    beq $s1, 10, SelectionScreen10.tela10
+    beq $s1, 11, SelectionScreen11.tela11
+    beq $s1, 12, SelectionScreen12.tela12
+    beq $s1, 13, SelectionScreen13.tela13
+
+SelectionScreen8.tela9:
+
+    SCREEN_IMAGE(tela2_1)
+    j SelectionScreen8.input
+
+SelectionScreen8.tela10:
+
+    SCREEN_IMAGE(tela2_2)
+    j SelectionScreen8.input
+
+SelectionScreen8.tela11:
+
+    SCREEN_IMAGE(tela2_3)
+    j SelectionScreen8.input
+
+SelectionScreen8.tela12:
+
+    SCREEN_IMAGE(tela2_4)
+    j SelectionScreen8.input
+
+SelectionScreen8.tela13:
+
+    SCREEN_IMAGE(tela2_4)
+    j SelectionScreen8.input
+
+SelectionScreen8.back:
+    
+    li $s1, 0
+
+SelectionScreen8.end:
     move $v0, $s1
 
     STACK_POP($ra, $s0, $s1, $s2)
