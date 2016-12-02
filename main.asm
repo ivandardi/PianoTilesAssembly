@@ -186,7 +186,8 @@
 
     ttls:  .word 42, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60, 67, 67, 65, 65, 64, 64, 62, 67, 67, 65, 65, 64, 64, 62, 60, 60, 67, 67, 69, 69, 67, 65, 65, 64, 64, 62, 62, 60
     hbty:  .word 25, 60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 69, 69, 72, 69, 65, 64, 62, 70, 70, 69, 65, 67, 65
-    tiles: .space 51
+    swtim: .word 66, 69, 69, 69, 65, 72, 69, 65, 7, 69, 64, 64, 64, 65, 60, 68, 65, 60, 69, 69, 69, 69, 69, 68, 67, 66, 65, 66, 70, 63, 62, 61, 60, 71, 60, 65, 68, 66, 67, 60, 69, 60, 64, 69, 69, 69, 69, 68, 67, 66, 65, 66, 70, 63, 62, 61, 60, 71, 60, 65, 68, 66, 60, 69, 65, 60, 69
+    tiles: .space 100
 
 .text
 
@@ -194,7 +195,11 @@
 
 main:
 
-    jal MainLoop
+#    jal MainLoop
+
+
+    la $a0, swtim
+    jal Gameloop4
 
 
 DONE
@@ -209,24 +214,24 @@ FUNCTION_BEGIN MainLoop #Control Setup and Game flow
 MainLoop.loop:
 
     # If $v0 is 1, then play with 4 columns of tiles
-    beq $v0, 0, MainLoop.loop.0 # initial
-    beq $v0, 1, MainLoop.loop.1 # select music 4 tiles
-    beq $v0, 2, MainLoop.loop.2 # select music 8 tiles
-    beq $v0, 3, MainLoop.loop.3 # information
-    beq $v0, 4, MainLoop.loop.4 # music 1 - 4 tiles
-    beq $v0, 5, MainLoop.loop.5 # music 2 - 4 tiles
-    beq $v0, 6, MainLoop.loop.6 # music 3 - 4 tiles
-    beq $v0, 7, MainLoop.loop.7 # music 4 - 4 tiles
-    beq $v0, 8, MainLoop.loop.8 # music 5 - 4 tiles
-    beq $v0, 9, MainLoop.loop.9 # music 1 - 8 tiles
-    beq $v0, 10, MainLoop.loop.10 # music 2 - 8 tiles
-    beq $v0, 11, MainLoop.loop.11 # music 3 - 8 tiles
-    beq $v0, 12, MainLoop.loop.12 # music 4 - 8 tiles
-    beq $v0, 13, MainLoop.loop.13 # music 5 - 8 tiles
-    beq $v0, 14, MainLoop.loop.14 # success - 4 tiles
-    beq $v0, 15, MainLoop.loop.15 # success - 8 tiles
-    beq $v0, 16, MainLoop.loop.16 # fail - 4 tiles
-    beq $v0, 17, MainLoop.loop.17 # fail - 8 tiles
+#    beq $v0, 0, MainLoop.loop.0 # initial
+#    beq $v0, 1, MainLoop.loop.1 # select music 4 tiles
+#    beq $v0, 2, MainLoop.loop.2 # select music 8 tiles
+#    beq $v0, 3, MainLoop.loop.3 # information
+#    beq $v0, 4, MainLoop.loop.4 # music 1 - 4 tiles
+#    beq $v0, 5, MainLoop.loop.5 # music 2 - 4 tiles
+#    beq $v0, 6, MainLoop.loop.6 # music 3 - 4 tiles
+#    beq $v0, 7, MainLoop.loop.7 # music 4 - 4 tiles
+#    beq $v0, 8, MainLoop.loop.8 # music 5 - 4 tiles
+#    beq $v0, 9, MainLoop.loop.9 # music 1 - 8 tiles
+#    beq $v0, 10, MainLoop.loop.10 # music 2 - 8 tiles
+#    beq $v0, 11, MainLoop.loop.11 # music 3 - 8 tiles
+#    beq $v0, 12, MainLoop.loop.12 # music 4 - 8 tiles
+#    beq $v0, 13, MainLoop.loop.13 # music 5 - 8 tiles
+#    beq $v0, 14, MainLoop.loop.14 # success - 4 tiles
+#    beq $v0, 15, MainLoop.loop.15 # success - 8 tiles
+#    beq $v0, 16, MainLoop.loop.16 # fail - 4 tiles
+#    beq $v0, 17, MainLoop.loop.17 # fail - 8 tiles
 
 MainLoop.loop.1:
 
@@ -825,13 +830,13 @@ FUNCTION_BEGIN ScreenImage
     STACK_PUSH($s0, $s1)
     li    $s0, SCREEN_BEGIN # iterator
     li    $s1, SCREEN_END   # end value of the for loop
-ClearScreen.forloop:
-    beq   $s0, $s1, ClearScreen.endforloop
+ScreenImage.forloop:
+    beq   $s0, $s1, ScreenImage.endforloop
     lw    $t0, 0($a0)
     sw    $t0, 0($s0)       # Set $s0 to the color stored in $a0
     addi  $s0, $s0, 4       # Increment %s0 by 4
     addi  $a0, $a0, 4
-    j     ClearScreen.forloop
-ClearScreen.endforloop:
+    j     ScreenImage.forloop
+ScreenImage.endforloop:
     STACK_POP($s0, $s1)
 FUNCTION_END
