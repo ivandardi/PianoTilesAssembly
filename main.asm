@@ -241,7 +241,8 @@ DONE
 
 
 
-FUNCTION_BEGIN MainLoop #Control Setup and Game flow
+# Control Setup and Game flow
+FUNCTION_BEGIN MainLoop
     STACK_PUSH($ra)
 
     jal MainScreen
@@ -249,35 +250,35 @@ FUNCTION_BEGIN MainLoop #Control Setup and Game flow
 MainLoop.loop:
 
      # If $v0 is 1, then play with 4 columns of tiles
-    beq $v0, -1, MainLoop.end # fail - 8 tiles
-    beq $v0, 0, MainLoop.loop.0 # initial
-    beq $v0, 1, MainLoop.loop.1 # select music 4 tiles
-    beq $v0, 2, MainLoop.loop.2 # select music 8 tiles
-    beq $v0, 3, MainLoop.loop.3 # information
-    beq $v0, 4, MainLoop.loop.4 # success
-    beq $v0, 5, MainLoop.loop.5 # fail
+    beq  $v0, -1, MainLoop.end # fail - 8 tiles
+    beq  $v0,  0, MainLoop.loop.0 # initial
+    beq  $v0,  1, MainLoop.loop.1 # select music 4 tiles
+    beq  $v0,  2, MainLoop.loop.2 # select music 8 tiles
+    beq  $v0,  3, MainLoop.loop.3 # information
+    beq  $v0,  4, MainLoop.loop.4 # success
+    beq  $v0,  5, MainLoop.loop.5 # fail
     # Musics 4 tiles
-    beq $v0, 10, MainLoop.loop.10 # music 1 - 4 tiles
-    beq $v0, 11, MainLoop.loop.11 # music 2 - 4 tiles
-    beq $v0, 12, MainLoop.loop.12 # music 3 - 4 tiles
-    beq $v0, 13, MainLoop.loop.13 # music 4 - 4 tiles
-    beq $v0, 14, MainLoop.loop.14 # music 5 - 4 tiles
-    beq $v0, 15, MainLoop.loop.15 # music 6 - 4 tiles
-    beq $v0, 16, MainLoop.loop.16 # music 7 - 4 tiles
-    beq $v0, 17, MainLoop.loop.17 # music 8 - 4 tiles
-    beq $v0, 18, MainLoop.loop.18 # music 9 - 4 tiles
-    beq $v0, 19, MainLoop.loop.19 # music 10 - 4 tiles
+    beq  $v0, 10, MainLoop.loop.10 # music 1 - 4 tiles
+    beq  $v0, 11, MainLoop.loop.11 # music 2 - 4 tiles
+    beq  $v0, 12, MainLoop.loop.12 # music 3 - 4 tiles
+    beq  $v0, 13, MainLoop.loop.13 # music 4 - 4 tiles
+    beq  $v0, 14, MainLoop.loop.14 # music 5 - 4 tiles
+    beq  $v0, 15, MainLoop.loop.15 # music 6 - 4 tiles
+    beq  $v0, 16, MainLoop.loop.16 # music 7 - 4 tiles
+    beq  $v0, 17, MainLoop.loop.17 # music 8 - 4 tiles
+    beq  $v0, 18, MainLoop.loop.18 # music 9 - 4 tiles
+    beq  $v0, 19, MainLoop.loop.19 # music 10 - 4 tiles
     # Musics 8 tiles
-    beq $v0, 20, MainLoop.loop.20 # music 1 - 8 tiles
-    beq $v0, 21, MainLoop.loop.21 # music 2 - 8 tiles
-    beq $v0, 22, MainLoop.loop.22 # music 3 - 8 tiles
-    beq $v0, 23, MainLoop.loop.23 # music 4 - 8 tiles
-    beq $v0, 24, MainLoop.loop.24 # music 5 - 8 tiles
-    beq $v0, 25, MainLoop.loop.25 # music 6 - 8 tiles
-    beq $v0, 26, MainLoop.loop.26 # music 7 - 8 tiles
-    beq $v0, 27, MainLoop.loop.27 # music 8 - 8 tiles
-    beq $v0, 28, MainLoop.loop.28 # music 9 - 8 tiles
-    beq $v0, 29, MainLoop.loop.29 # music 10 - 8 tiles
+    beq  $v0, 20, MainLoop.loop.20 # music 1 - 8 tiles
+    beq  $v0, 21, MainLoop.loop.21 # music 2 - 8 tiles
+    beq  $v0, 22, MainLoop.loop.22 # music 3 - 8 tiles
+    beq  $v0, 23, MainLoop.loop.23 # music 4 - 8 tiles
+    beq  $v0, 24, MainLoop.loop.24 # music 5 - 8 tiles
+    beq  $v0, 25, MainLoop.loop.25 # music 6 - 8 tiles
+    beq  $v0, 26, MainLoop.loop.26 # music 7 - 8 tiles
+    beq  $v0, 27, MainLoop.loop.27 # music 8 - 8 tiles
+    beq  $v0, 28, MainLoop.loop.28 # music 9 - 8 tiles
+    beq  $v0, 29, MainLoop.loop.29 # music 10 - 8 tiles
 
 
 
@@ -304,154 +305,154 @@ MainLoop.loop.3:
 MainLoop.loop.4:
 
     move $a0, $v1
-    jal SuccessScreen
-    j MainLoop.loop
+    jal  SuccessScreen
+    j    MainLoop.loop
 
 MainLoop.loop.5:
 
     move $a0, $v1
-    jal FailureScreen
-    j MainLoop.loop
+    jal  FailureScreen
+    j    MainLoop.loop
 
 MainLoop.loop.10:
 
-    la $a0, hbty
+    la   $a0, hbty
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.11:
 
-    la $a0, ttls
+    la   $a0, ttls
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.12:
 
-    la $a0, civv
+    la   $a0, civv
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.13:
 
-    la $a0, swtim
+    la   $a0, swtim
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.14:
 
-    la $a0, mario
+    la   $a0, mario
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.15:
 
-    la $a0, hp
+    la   $a0, hp
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.16:
 
-    la $a0, clocks
+    la   $a0, clocks
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.17:
 
-    la $a0, skyrim
+    la   $a0, skyrim
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.18:
 
-    la $a0, lsong
+    la   $a0, lsong
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.19:
 
-    la $a0, dbz
+    la   $a0, dbz
     move $a1, $v0
-    jal Gameloop4
-    j MainLoop.loop
+    jal  Gameloop4
+    j    MainLoop.loop
 
 MainLoop.loop.20:
 
-    la $a0, hbty
+    la   $a0, hbty
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.21:
 
-    la $a0, ttls
+    la   $a0, ttls
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.22:
 
-    la $a0, civv
+    la   $a0, civv
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.23:
 
-    la $a0, swtim
+    la   $a0, swtim
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.24:
 
-    la $a0, mario
+    la   $a0, mario
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.25:
 
-    la $a0, hp
+    la   $a0, hp
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.26:
 
-    la $a0, clocks
+    la   $a0, clocks
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.27:
 
-    la $a0, skyrim
+    la   $a0, skyrim
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.28:
 
-    la $a0, lsong
+    la   $a0, lsong
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.loop.29:
 
-    la $a0, dbz
+    la   $a0, dbz
     move $a1, $v0
-    jal Gameloop8
-    j MainLoop.loop
+    jal  Gameloop8
+    j    MainLoop.loop
 
 MainLoop.end:
 
@@ -460,7 +461,8 @@ FUNCTION_END
 
 
 
-FUNCTION_BEGIN MainScreen #Position Code: 0
+# Position Code: 0
+FUNCTION_BEGIN MainScreen
     STACK_PUSH($ra, $s0, $s1, $s2)
 
     SCREEN_IMAGE(tela_inicial1)
@@ -481,21 +483,21 @@ MainScreen.input:
     # $s2 has the user input
 
     # Check to see if the user pressed w or W
-    beq $s2, 119, MainScreen.w
-    beq $s2, 87, MainScreen.w
+    beq  $s2, 119, MainScreen.w
+    beq  $s2, 87, MainScreen.w
 
     # Check to see if the user pressed s or S
-    beq $s2, 115, MainScreen.s
-    beq $s2, 83, MainScreen.s
+    beq  $s2, 115, MainScreen.s
+    beq  $s2, 83, MainScreen.s
 
     # Check to see if the user pressed enter
-    beq $s2, 10, MainScreen.enter
+    beq  $s2, 10, MainScreen.enter
 
     # Check to see if the user pressed ESC
-    beq $s2, 27, MainScreen.end
+    beq  $s2, 27, MainScreen.end
 
     # Check to see if the user pressed BackSpace
-    beq $s2, 8, MainScreen.end
+    beq  $s2,  8, MainScreen.end
 
     j MainScreen.input
 
@@ -504,20 +506,20 @@ MainScreen.w:
     beq  $s1, 1, MainScreen.input
     addi $s1, $s1, -1
 
-    j MainScreen.screen
+    j    MainScreen.screen
 
 MainScreen.s:
 
     beq  $s1, 3, MainScreen.input
     addi $s1, $s1, 1
 
-    j MainScreen.screen
+    j    MainScreen.screen
 
 MainScreen.screen:
 
-    beq $s1, 1, MainScreen.tela1
-    beq $s1, 2, MainScreen.tela2
-    beq $s1, 3, MainScreen.tela3
+    beq  $s1, 1, MainScreen.tela1
+    beq  $s1, 2, MainScreen.tela2
+    beq  $s1, 3, MainScreen.tela3
 
 MainScreen.tela1:
 
@@ -535,7 +537,9 @@ MainScreen.tela3:
     j MainScreen.input
 
 MainScreen.end:
-    li $s1, -1
+
+    li   $s1, -1
+
 MainScreen.enter:
 
     move $v0, $s1
@@ -545,7 +549,8 @@ FUNCTION_END
 
 
 
-FUNCTION_BEGIN InfoScreen #Position Code: 3
+# Position Code: 3
+FUNCTION_BEGIN InfoScreen
     STACK_PUSH($ra, $s0, $s2)
 
     SCREEN_IMAGE(about)
@@ -564,11 +569,10 @@ InfoScreen.input:
     # $s2 has the user input
 
     # Check to see if the user pressed ESC
-    beq $s2, 27, InfoScreen.back
+    beq  $s2, 27, InfoScreen.back
 
     # Check to see if the user pressed BackSpace
-    beq $s2, 8, InfoScreen.back
-
+    beq  $s2,  8, InfoScreen.back
 
     j InfoScreen.input
 
@@ -581,7 +585,8 @@ FUNCTION_END
 
 
 
-FUNCTION_BEGIN SelectionScreen4 #Position Code: 1 or 2, paratemer
+# Position Code: 1 or 2, parameter
+FUNCTION_BEGIN SelectionScreen4
     STACK_PUSH($ra, $s0, $s1, $s2)
 
     SCREEN_IMAGE(playlist1)
@@ -602,21 +607,21 @@ SelectionScreen4.input:
     # $s2 has the user input
 
     # Check to see if the user pressed ESC
-    beq $s2, 27, SelectionScreen4.back
+    beq  $s2,  27, SelectionScreen4.back
 
     # Check to see if the user pressed BackSpace
-    beq $s2, 8, SelectionScreen4.back
+    beq  $s2,   8, SelectionScreen4.back
 
     # Check to see if the user pressed w or W
-    beq $s2, 119, SelectionScreen4.w
-    beq $s2, 87, SelectionScreen4.w
+    beq  $s2, 119, SelectionScreen4.w
+    beq  $s2,  87, SelectionScreen4.w
 
     # Check to see if the user pressed s or S
-    beq $s2, 115, SelectionScreen4.s
-    beq $s2, 83, SelectionScreen4.s
+    beq  $s2, 115, SelectionScreen4.s
+    beq  $s2,  83, SelectionScreen4.s
 
     # Check to see if the user pressed enter
-    beq $s2, 10, SelectionScreen4.enter
+    beq  $s2,  10, SelectionScreen4.enter
 
     j SelectionScreen4.input
 
@@ -625,7 +630,7 @@ SelectionScreen4.w:
     beq  $s1, 10, SelectionScreen4.input
     addi $s1, $s1, -1
 
-    j SelectionScreen4.screen
+    j    SelectionScreen4.screen
 
 SelectionScreen4.s:
 
@@ -636,16 +641,16 @@ SelectionScreen4.s:
 
 SelectionScreen4.screen:
 
-    beq $s1, 10, SelectionScreen4.tela10
-    beq $s1, 11, SelectionScreen4.tela11
-    beq $s1, 12, SelectionScreen4.tela12
-    beq $s1, 13, SelectionScreen4.tela13
-    beq $s1, 14, SelectionScreen4.tela14
-    beq $s1, 15, SelectionScreen4.tela15
-    beq $s1, 16, SelectionScreen4.tela16
-    beq $s1, 17, SelectionScreen4.tela17
-    beq $s1, 18, SelectionScreen4.tela18
-    beq $s1, 19, SelectionScreen4.tela19
+    beq  $s1, 10, SelectionScreen4.tela10
+    beq  $s1, 11, SelectionScreen4.tela11
+    beq  $s1, 12, SelectionScreen4.tela12
+    beq  $s1, 13, SelectionScreen4.tela13
+    beq  $s1, 14, SelectionScreen4.tela14
+    beq  $s1, 15, SelectionScreen4.tela15
+    beq  $s1, 16, SelectionScreen4.tela16
+    beq  $s1, 17, SelectionScreen4.tela17
+    beq  $s1, 18, SelectionScreen4.tela18
+    beq  $s1, 19, SelectionScreen4.tela19
 
 SelectionScreen4.tela10:
 
@@ -699,7 +704,7 @@ SelectionScreen4.tela19:
 
 SelectionScreen4.back:
 
-    li $s1, 0
+    li   $s1, 0
 
 SelectionScreen4.enter:
 
@@ -709,7 +714,8 @@ SelectionScreen4.enter:
 FUNCTION_END
 
 
-    # Selection for 8bits
+
+# Selection for 8bits
 FUNCTION_BEGIN SelectionScreen8
     STACK_PUSH($ra, $s0, $s1, $s2)
 
@@ -731,21 +737,21 @@ SelectionScreen8.input:
     # $s2 has the user input
 
     # Check to see if the user pressed ESC
-    beq $s2, 27, SelectionScreen8.back
+    beq  $s2,  27, SelectionScreen8.back
 
     # Check to see if the user pressed BackSpace
-    beq $s2, 8, SelectionScreen8.back
+    beq  $s2,   8, SelectionScreen8.back
 
     # Check to see if the user pressed w or W
-    beq $s2, 119, SelectionScreen8.w
-    beq $s2, 87, SelectionScreen8.w
+    beq  $s2, 119, SelectionScreen8.w
+    beq  $s2,  87, SelectionScreen8.w
 
     # Check to see if the user pressed s or S
-    beq $s2, 115, SelectionScreen8.s
-    beq $s2, 83, SelectionScreen8.s
+    beq  $s2, 115, SelectionScreen8.s
+    beq  $s2,  83, SelectionScreen8.s
 
     # Check to see if the user pressed enter
-    beq $s2, 10, SelectionScreen8.enter
+    beq  $s2,  10, SelectionScreen8.enter
 
     j SelectionScreen8.input
 
@@ -765,16 +771,16 @@ SelectionScreen8.s:
 
 SelectionScreen8.screen:
 
-    beq $s1, 20, SelectionScreen8.tela20
-    beq $s1, 21, SelectionScreen8.tela21
-    beq $s1, 22, SelectionScreen8.tela22
-    beq $s1, 23, SelectionScreen8.tela23
-    beq $s1, 24, SelectionScreen8.tela24
-    beq $s1, 25, SelectionScreen8.tela25
-    beq $s1, 26, SelectionScreen8.tela26
-    beq $s1, 27, SelectionScreen8.tela27
-    beq $s1, 28, SelectionScreen8.tela28
-    beq $s1, 29, SelectionScreen8.tela29
+    beq  $s1, 20, SelectionScreen8.tela20
+    beq  $s1, 21, SelectionScreen8.tela21
+    beq  $s1, 22, SelectionScreen8.tela22
+    beq  $s1, 23, SelectionScreen8.tela23
+    beq  $s1, 24, SelectionScreen8.tela24
+    beq  $s1, 25, SelectionScreen8.tela25
+    beq  $s1, 26, SelectionScreen8.tela26
+    beq  $s1, 27, SelectionScreen8.tela27
+    beq  $s1, 28, SelectionScreen8.tela28
+    beq  $s1, 29, SelectionScreen8.tela29
 
 SelectionScreen8.tela20:
 
@@ -828,7 +834,7 @@ SelectionScreen8.tela29:
 
 SelectionScreen8.back:
 
-    li $s1, 0
+    li   $s1, 0
 
 SelectionScreen8.enter:
 
@@ -839,7 +845,7 @@ FUNCTION_END
 
 
 
-# $a0: ID da M?sica Escolhida
+# $a0: ID da Musica Escolhida
 FUNCTION_BEGIN SuccessScreen
     STACK_PUSH($ra, $s0, $s1, $s2, $s3)
 
@@ -864,15 +870,15 @@ SuccessScreen.input:
     # $s2 has the user input
 
     # Check to see if the user pressed w or W
-    beq $s2, 119, SuccessScreen.w
-    beq $s2, 87, SuccessScreen.w
+    beq  $s2, 119, SuccessScreen.w
+    beq  $s2, 87, SuccessScreen.w
 
     # Check to see if the user pressed s or S
-    beq $s2, 115, SuccessScreen.s
-    beq $s2, 83, SuccessScreen.s
+    beq  $s2, 115, SuccessScreen.s
+    beq  $s2, 83, SuccessScreen.s
 
     # Check to see if the user pressed enter
-    beq $s2, 10, SuccessScreen.enter
+    beq  $s2, 10, SuccessScreen.enter
 
     j SuccessScreen.input
 
@@ -892,8 +898,8 @@ SuccessScreen.s:
 
 SuccessScreen.screen:
 
-    beq $s1, 1, SuccessScreen.tela1
-    beq $s1, 2, SuccessScreen.tela2
+    beq  $s1, 1, SuccessScreen.tela1
+    beq  $s1, 2, SuccessScreen.tela2
 
 SuccessScreen.tela1:
 
@@ -907,8 +913,8 @@ SuccessScreen.tela2:
 
 SuccessScreen.enter:
 
-    li $v0, 0
-    beq $s1, 2, SuccessScreen.end
+    li   $v0, 0
+    beq  $s1, 2, SuccessScreen.end
     move $v0, $s3
 
 SuccessScreen.end:
@@ -917,7 +923,7 @@ FUNCTION_END
 
 
 
-# $a0: ID da M?sica Escolhida
+# $a0: ID da Musica Escolhida
 FUNCTION_BEGIN FailureScreen
     STACK_PUSH($ra, $s0, $s1, $s2, $s3)
 
@@ -950,15 +956,15 @@ FailureScreen.input:
     # $s2 has the user input
 
     # Check to see if the user pressed w or W
-    beq $s2, 119, FailureScreen.w
-    beq $s2, 87, FailureScreen.w
+    beq  $s2, 119, FailureScreen.w
+    beq  $s2, 87, FailureScreen.w
 
     # Check to see if the user pressed s or S
-    beq $s2, 115, FailureScreen.s
-    beq $s2, 83, FailureScreen.s
+    beq  $s2, 115, FailureScreen.s
+    beq  $s2, 83, FailureScreen.s
 
     # Check to see if the user pressed enter
-    beq $s2, 10, FailureScreen.enter
+    beq  $s2, 10, FailureScreen.enter
 
     j FailureScreen.input
 
@@ -978,8 +984,8 @@ FailureScreen.s:
 
 FailureScreen.screen:
 
-    beq $s1, 1, FailureScreen.tela1
-    beq $s1, 2, FailureScreen.tela2
+    beq  $s1, 1, FailureScreen.tela1
+    beq  $s1, 2, FailureScreen.tela2
 
 FailureScreen.tela1:
 
@@ -993,8 +999,8 @@ FailureScreen.tela2:
 
 FailureScreen.enter:
 
-    li $v0, 0
-    beq $s1, 2, FailureScreen.end
+    li   $v0, 0
+    beq  $s1, 2, FailureScreen.end
     move $v0, $s3
 
 FailureScreen.end:
@@ -1007,7 +1013,7 @@ FUNCTION_END
 # Funcao do gameloop para 4 colunas de tiles
 #
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
-# $a1: ID da M?sica Escolhida
+# $a1: ID da Musica Escolhida
 FUNCTION_BEGIN Gameloop4
     STACK_PUSH($ra, $s0, $s1, $s2, $s3)
 
@@ -1109,13 +1115,13 @@ Gameloop4.display:
 
 Gameloop4.failure:
 
-    li $v0, 5
+    li   $v0, 5
 
     j    Gameloop4.end
 
 Gameloop4.success:
 
-    li $v0, 4
+    li   $v0, 4
 
 Gameloop4.end:
 
@@ -1126,11 +1132,12 @@ FUNCTION_END
 
 
 
-# Funcao do gameloop para 4 colunas de tiles
+# Funcao do gameloop para 4 colunas de tiles]
+# Position code 4 or 5
 #
 # $a0: Endereco da musica, com a quantidade de notas no primeiro elemento
-# $a1: ID da M?sica Escolhida
-FUNCTION_BEGIN Gameloop8 #Posiition code 4 or 5
+# $a1: ID da Musica Escolhida
+FUNCTION_BEGIN Gameloop8
     STACK_PUSH($ra, $s0, $s1, $s2, $s3)
 
     # Load music id
@@ -1231,13 +1238,13 @@ Gameloop8.display:
 
 Gameloop8.failure:
 
-    li $v0, 5
+    li   $v0, 5
 
     j    Gameloop8.end
 
 Gameloop8.success:
 
-    li $v0, 4
+    li   $v0, 4
 
 Gameloop8.end:
 
@@ -1313,13 +1320,13 @@ FUNCTION_END
 # $a0: cor
 FUNCTION_BEGIN ClearScreen
     STACK_PUSH($s0, $s1)
-    li    $s0, SCREEN_BEGIN # iterator
-    li    $s1, SCREEN_END   # end value of the for loop
+    li   $s0, SCREEN_BEGIN # iterator
+    li   $s1, SCREEN_END   # end value of the for loop
 ClearScreen.forloop:
-    beq   $s0, $s1, ClearScreen.endforloop
-    sw    $a0, 0($s0)       # Set $s0 to the color stored in $a0
-    addi  $s0, $s0, 4       # Increment %s0 by 4
-    j     ClearScreen.forloop
+    beq  $s0, $s1, ClearScreen.endforloop
+    sw   $a0, 0($s0)       # Set $s0 to the color stored in $a0
+    addi $s0, $s0, 4       # Increment %s0 by 4
+    j    ClearScreen.forloop
 ClearScreen.endforloop:
     STACK_POP($s0, $s1)
 FUNCTION_END
@@ -1341,7 +1348,7 @@ DrawRect.forloop1:
 
     move $t0, $a0                       # j = x
 DrawRect.forloop2:
-    beq $t0, $s0, DrawRect.endforloop2 # j < x + 8
+    beq  $t0, $s0, DrawRect.endforloop2 # j < x + 8
 
     move $t1, $a1                       # $t1 = y
     rol  $t1, $t1, 5                    # $t1 = y  * SCREEN_WIDTH
@@ -1366,15 +1373,15 @@ FUNCTION_END
 # $a0: endereco de memoria com o vetor de tela
 FUNCTION_BEGIN ScreenImage
     STACK_PUSH($s0, $s1)
-    li    $s0, SCREEN_BEGIN # iterator
-    li    $s1, SCREEN_END   # end value of the for loop
+    li   $s0, SCREEN_BEGIN # iterator
+    li   $s1, SCREEN_END   # end value of the for loop
 ScreenImage.forloop:
-    beq   $s0, $s1, ScreenImage.endforloop
-    lw    $t0, 0($a0)
-    sw    $t0, 0($s0)       # Set $s0 to the color stored in $a0
-    addi  $s0, $s0, 4       # Increment %s0 by 4
-    addi  $a0, $a0, 4
-    j     ScreenImage.forloop
+    beq  $s0, $s1, ScreenImage.endforloop
+    lw   $t0, 0($a0)
+    sw   $t0, 0($s0)       # Set $s0 to the color stored in $a0
+    addi $s0, $s0, 4       # Increment %s0 by 4
+    addi $a0, $a0, 4
+    j    ScreenImage.forloop
 ScreenImage.endforloop:
     STACK_POP($s0, $s1)
 FUNCTION_END
