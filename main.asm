@@ -244,7 +244,7 @@ DONE
 # Control Setup and Game flow
 FUNCTION_BEGIN MainLoop
     STACK_PUSH($ra)
-    
+
     li $a0, 1
     jal MainScreen
 
@@ -466,25 +466,25 @@ FUNCTION_END
 # $a0: Tela do Menu (1 a 3)
 FUNCTION_BEGIN MainScreen
     STACK_PUSH($ra, $s0, $s1, $s2)
-    
+
     move $s1, $a0  # Set $s1 to 1, 2 or 3. $s1 is the position
-    
+
     bne $s1, 3, MainScreen.initialNot3
     SCREEN_IMAGE(tela_inicial3)
     j MainScreen.initialEnd
-    
+
 MainScreen.initialNot3:
 
     bne $s1, 2, MainScreen.initialNot2
     SCREEN_IMAGE(tela_inicial2)
     j MainScreen.initialEnd
-    
+
 MainScreen.initialNot2:
-    
+
     SCREEN_IMAGE(tela_inicial1)
- 
+
 MainScreen.initialEnd:
-    
+
     # INPUT
     li $s0, USER_INPUT
 
@@ -1294,8 +1294,8 @@ FUNCTION_BEGIN CreateRandomTiles
 
     # Set the rgn seed with the current time
     li   $v0, 40
-    xor  $a0, $a0, $a0
     move $a1, $a0
+    xor  $a0, $a0, $a0
     syscall
 
     # Load upper range of the rgn
