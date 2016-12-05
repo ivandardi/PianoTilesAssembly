@@ -244,7 +244,8 @@ DONE
 # Control Setup and Game flow
 FUNCTION_BEGIN MainLoop
     STACK_PUSH($ra)
-
+    
+    li $a0, 1
     jal MainScreen
 
 MainLoop.loop:
@@ -284,6 +285,7 @@ MainLoop.loop:
 
 MainLoop.loop.0:
 
+    move $a0, $v1
     jal MainScreen
     j MainLoop.loop
 
@@ -461,16 +463,30 @@ FUNCTION_END
 
 
 
-# Position Code: 0
+# $a0: Tela do Menu (1 a 3)
 FUNCTION_BEGIN MainScreen
     STACK_PUSH($ra, $s0, $s1, $s2)
+    
+    move $s1, $a0  # Set $s1 to 1, 2 or 3. $s1 is the position
+    
+    bne $s1, 3, MainScreen.initialNot3
+    SCREEN_IMAGE(tela_inicial3)
+    j MainScreen.initialEnd
+    
+MainScreen.initialNot3:
 
+    bne $s1, 2, MainScreen.initialNot2
+    SCREEN_IMAGE(tela_inicial2)
+    j MainScreen.initialEnd
+    
+MainScreen.initialNot2:
+    
     SCREEN_IMAGE(tela_inicial1)
-
+ 
+MainScreen.initialEnd:
+    
     # INPUT
     li $s0, USER_INPUT
-
-    li $s1, 1  # Set $s1 to 1. $s1 is the position
 
 MainScreen.input:
     # read user input
@@ -579,6 +595,7 @@ InfoScreen.input:
 InfoScreen.back:
 
     li $v0, 0
+    li $v1, 3
 
     STACK_POP($ra, $s0, $s2)
 FUNCTION_END
@@ -705,6 +722,7 @@ SelectionScreen4.tela19:
 SelectionScreen4.back:
 
     li   $s1, 0
+    li   $v1, 1
 
 SelectionScreen4.enter:
 
@@ -835,6 +853,7 @@ SelectionScreen8.tela29:
 SelectionScreen8.back:
 
     li   $s1, 0
+    li   $v1, 2
 
 SelectionScreen8.enter:
 
@@ -914,6 +933,7 @@ SuccessScreen.tela2:
 SuccessScreen.enter:
 
     li   $v0, 0
+    li   $v1, 1
     beq  $s1, 2, SuccessScreen.end
     move $v0, $s3
 
@@ -1000,6 +1020,7 @@ FailureScreen.tela2:
 FailureScreen.enter:
 
     li   $v0, 0
+    li   $v1, 1
     beq  $s1, 2, FailureScreen.end
     move $v0, $s3
 
